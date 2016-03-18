@@ -1,0 +1,25 @@
+{
+  "name": "bet-bg",
+  "version": "0.0.1",
+  "description": "BETool background module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BETool/bet-bg.git"
+  },
+  "author": "Mikhail Garbuzov <madmxg@gmail.com>",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/BETool/bet-bg/issues"
+  },
+  "homepage": "https://github.com/BETool/bet-bg#readme",
+  "dependencies": {
+    "bet-ctor": "0.0.1",
+    "bet-helper": "0.0.1",
+    "bet-logger": "0.0.1",
+    "bet-talker": "0.0.1"
+  }
+}
