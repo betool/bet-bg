@@ -1,6 +1,6 @@
 {
   "name": "bet-bg",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "BETool background module",
   "main": "index.js",
   "scripts": {
@@ -17,9 +17,9 @@
   },
   "homepage": "https://github.com/BETool/bet-bg#readme",
   "dependencies": {
-    "bet-ctor": "^0.0.1",
-    "bet-helper": "^0.0.1",
-    "bet-logger": "^0.0.2",
-    "bet-talker": "^0.0.1"
+    "bet-ctor": "latest",
+    "bet-helper": "latest",
+    "bet-logger": "latest",
+    "bet-talker": "latest"
   }
 }
