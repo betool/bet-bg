@@ -34,7 +34,6 @@ export default class BetBackground {
     log('load');
 
     this.loadConfiguration(this.setReady.bind(this));
-    this.foo();
   }
 
 
@@ -48,11 +47,6 @@ export default class BetBackground {
     for (propName in this.talker.onReadyCbs) {
       this.talker.onReadyCbs[propName]();
     }
-  }
-
-
-  foo (foo = ['noop', 'console.log(\'noop\');']) {
-    this.modules[foo[0]] = ctor.function(foo[1]);
   }
 
 
