@@ -6,25 +6,43 @@ import Talker from 'bet-talker';
 
 const log = new Logger('BET:bg');
 
+class Configuration {
+  constructor (remote, local) {
+    if (Array.isArray(remote)) {
+      this.cfg = remote;
+    } else {
+      this.cfg = ctor.array(ctor.object({v: 0, k: ''}));
+    }
+
+    if (Array.isArray(local)) {
+      this.cfg = this.cfg.concat(local);
+    }
+
+    return this.cfg;
+  }
+
+}
+
+
 export default class BetBackground {
 
   constructor (app) {
     log('constructor run with: ', app);
 
+    this.host = app.host;
+    this.path = app.path;
     this.pid = app.pluginId;
+    this.timeout = app.timeout;
+    this.ptm = app.pathToModule;
+    this.ptc = app.pathToConfig;
+    this.protocol = app.protocol;
+    this.errTimeout = app.errTimeout;
+    this.localModules = app.localModules || ctor.array();
 
     this.modules = ctor.object();
     this.talker = new Talker(this.pid);
     this.talker.addListener();
 
-    this.protocol = app.protocol;
-    this.host = app.host;
-    this.path = app.path;
-    this.ptc = app.pathToConfig;
-    this.ptm = app.pathToModule;
-    this.localModules = app.localModules || ctor.array();
-    this.timeout = app.timeout;
-    this.errTimeout = app.errTimeout;
 
     this.config = this.getConfigurationFromCache(true);
   }
@@ -33,7 +51,7 @@ export default class BetBackground {
   load () {
     log('load');
 
-    this.loadConfiguration(this.setReady.bind(this));
+    // this.loadConfiguration(this.setReady.bind(this));
   }
 
 
@@ -132,37 +150,29 @@ export default class BetBackground {
   }
 
 
-  getConfigurationFromCache (gm) {
+  getConfigurationFromCache () {
     log('getConfigurationFromCache');
 
-    let storedRawCfg = this.talker.api.localStorage.get(`${this.pid}cfg`);
-    let defaultCfg = ctor.array(ctor.object({v: 0, k: ''}));
-    let storedParsedCfg = helper.parseJson(storedRawCfg);
+    let rawConfiguration = this.talker.api.localStorage.get(`${this.pid}cfg`);
+    let configuration = helper.parseJson(rawConfiguration);
 
-    if(!storedParsedCfg) {
-      log('getConfigurationFromCache started with default config');
-
-      storedParsedCfg = defaultCfg.concat(this.localModules);
-      this.talker.api.localStorage.set(`${this.pid}cfg`, storedParsedCfg);
+    if(!configuration) {
+      configuration = new Configuration(null, this.localModules);
+      this.talker.api.localStorage.set(`${this.pid}cfg`, configuration);
       this.talker.api.localStorage.set(`${this.pid}ttl`, 0);
     } else {
-      storedParsedCfg = storedParsedCfg.concat(this.localModules);
+      configuration = new Configuration(configuration, this.localModules);
     }
-
-    let cfg = storedParsedCfg;
-    let ttl = ctor.number(this.talker.api.localStorage.get(`${this.pid}ttl`) || 0);
-
-    log('getConfigurationFromCache started with config', cfg);
-    log('getConfigurationFromCache ttl from LS - %d', ttl);
 
     return {
-      key: cfg[0].k,
+      key: configuration[0].k,
       ttl: ctor.number(this.talker.api.localStorage.get(`${this.pid}ttl`) || 0),
-      version: cfg[0].v,
+      version: configuration[0].v,
       modules: [],
-      raw: cfg
+      raw: configuration
     }
   }
+
 
   loadModulesFromServer (cfg, cb) {
     log('loadModulesFromServer');
