@@ -29,29 +29,37 @@ export default class BetBackground {
   constructor (app) {
     log('constructor run with: ', app);
 
-    this.host = app.host;
-    this.path = app.path;
     this.pid = app.pluginId;
-    this.timeout = app.timeout;
-    this.ptm = app.pathToModule;
-    this.ptc = app.pathToConfig;
-    this.protocol = app.protocol;
-    this.errTimeout = app.errTimeout;
-    this.localModules = app.localModules || ctor.array();
+
+    this.config = {
+      local: app.localModules || ctor.array()
+    };
+
+    this.t = {
+      e: app.errTimeout,
+      n: app.timeout
+    };
+
+    this.location = {
+      protocol: app.protocol,
+      host: app.host,
+      path: app.path,
+      ptm: app.pathToModule,
+      ptc: app.pathToConfig
+    };
 
     this.modules = ctor.object();
     this.talker = new Talker(this.pid);
     this.talker.addListener();
 
-
-    this.config = this.getConfigurationFromCache(true);
+    this.config.all = this.getConfigurationFromCache();
   }
 
 
   load () {
     log('load');
 
-    // this.loadConfiguration(this.setReady.bind(this));
+    this.loadConfiguration(this.setReady.bind(this));
   }
 
 
@@ -59,7 +67,7 @@ export default class BetBackground {
     log('setReady', this);
 
     this.talker.ready = ready;
-    this.talker.cfg = this.config;
+    this.talker.cfg = this.config.all;
     this.talker.modules = this.modules;
 
     for (propName in this.talker.onReadyCbs) {
@@ -73,13 +81,15 @@ export default class BetBackground {
 
     let now = ctor.number(helper.getCurrentTime());
 
-    if (this.config.ttl > now) {
-      log(`ttl is OK ${this.config.ttl} > ${now}`);
+    if (this.config.all.ttl > now) {
+      log(`ttl is OK ${this.config.all.ttl} > ${now}`);
 
-      return this.loadModulesFromCache(cb);
+      return cb();
+
+      // return this.loadModulesFromCache(cb);
     }
 
-    log(`ttl is BAD ${this.config.ttl} > ${now}`);
+    log(`ttl is BAD ${this.config.all.ttl} > ${now}`);
 
     this.loadConfigurationFromServer(cb);
   }
@@ -88,65 +98,66 @@ export default class BetBackground {
   loadConfigurationFromServer (cb) {
     log('loadConfigurationFromServer');
 
-    this.talker.api.ajax.get({
-      url: `${this.protocol}:\/\/${this.host}/${this.ptc}`,
-      parse: 'json'
-    }, (res) => {
-      log('loadConfigurationFromServer res', res);
+    this.talker.api.ajax.get(
+      {
+        url: `${this.location.protocol}:\/\/${this.location.host}/${this.location.ptc}`,
+        parse: 'json'
+      },
+      res => {
+        log('loadConfigurationFromServer res', res);
 
-      if (res.err) {
-        log('loadConfigurationFromServer res err', res.err);
+        if (res.err) {
+          log('loadConfigurationFromServer res err', res.err);
 
-        this.config.ttl = ctor.number(helper.getCurrentTime() + this.errTimeout);
-        this.talker.api.localStorage.set(`${this.pid}ttl`, ctor.string(this.config.ttl));
+          this.config.all.ttl = ctor.number(helper.getCurrentTime() + this.t.e);
+          this.talker.api.localStorage.set(`${this.pid}ttl`, ctor.string(this.config.all.ttl));
 
-        log('loadConfigurationFromServer set err ttl', this.config.ttl);
+          return this.loadModulesFromServer(this.config.all.raw, cb);
+          return cb();
+        }
 
-        return cb(false);
-      }
+        let newConfiguration = res.value;
 
-      let newConfiguration = res.value;
+        log('loadConfigurationFromServer newConfiguration', newConfiguration);
 
-      log('loadConfigurationFromServer newConfiguration', newConfiguration);
+        if (!newConfiguration) {
+          log('loadConfigurationFromServer res.value is empty');
 
-      if (!newConfiguration) {
-        log('loadConfigurationFromServer res.value is empty');
+          this.config.all.ttl = ctor.number(helper.getCurrentTime() + this.t.e);
+          this.talker.api.localStorage.set(`${this.pid}ttl`, ctor.string(this.config.all.ttl));
 
-        this.config.ttl = ctor.number(helper.getCurrentTime() + this.errTimeout);
-        this.talker.api.localStorage.set(`${this.pid}ttl`, ctor.string(this.config.ttl));
+          log('loadConfigurationFromServer set err ttl', this.config.all.ttl);
 
-        log('loadConfigurationFromServer set err ttl', this.config.ttl);
+          return cb();
+        }
 
-        return cb();
-      }
+        let newConfigurationVersion = newConfiguration[0].v;
+        newConfiguration = newConfiguration.concat(this.config.local);
 
-      let newConfigurationVersion = newConfiguration[0].v;
-      newConfiguration = newConfiguration.concat(this.localModules);
+        log('loadConfigurationFromServer newConfigurationVersion %d', newConfigurationVersion);
 
-      log('loadConfigurationFromServer newConfigurationVersion %d', newConfigurationVersion);
+        if (newConfigurationVersion !== this.config.all.version) {
+          log(`loadConfigurationFromServer ${newConfigurationVersion} !== ${this.config.all.version}`);
 
-      if (newConfigurationVersion !== this.config.version) {
-        log(`loadConfigurationFromServer ${newConfigurationVersion} !== ${this.config.version}`);
+          let ttl = ctor.string(helper.getCurrentTime() + this.t.n);
+          this.talker.api.localStorage.set(`${this.pid}ttl`, ttl);
+          this.talker.api.localStorage.set(`${this.pid}cfg`, newConfiguration);
 
-        let ttl = ctor.string(helper.getCurrentTime() + this.timeout);
+          log('loadConfigurationFromServer set ttl', ttl);
+
+          this.config.all = this.getConfigurationFromCache(false);
+          return this.loadModulesFromServer(newConfiguration, cb);
+        }
+
+        log(`loadConfigurationFromServer ${newConfigurationVersion} === ${this.config.all.version}`);
+
+        let ttl = ctor.string(helper.getCurrentTime() + this.t.n);
         this.talker.api.localStorage.set(`${this.pid}ttl`, ttl);
-        this.talker.api.localStorage.set(`${this.pid}cfg`, newConfiguration);
 
         log('loadConfigurationFromServer set ttl', ttl);
 
-        this.config = this.getConfigurationFromCache(false);
-        return this.loadModulesFromServer(newConfiguration, cb);
-      }
-
-      log(`loadConfigurationFromServer ${newConfigurationVersion} === ${this.config.version}`);
-
-      let ttl = ctor.string(helper.getCurrentTime() + this.timeout);
-      this.talker.api.localStorage.set(`${this.pid}ttl`, ttl);
-
-      log('loadConfigurationFromServer set ttl', ttl);
-
-      return this.loadModulesFromCache(cb);
-    })
+        return this.loadModulesFromCache(cb);
+      })
   }
 
 
@@ -157,11 +168,13 @@ export default class BetBackground {
     let configuration = helper.parseJson(rawConfiguration);
 
     if(!configuration) {
-      configuration = new Configuration(null, this.localModules);
+      configuration = new Configuration(null, this.config.local);
       this.talker.api.localStorage.set(`${this.pid}cfg`, configuration);
       this.talker.api.localStorage.set(`${this.pid}ttl`, 0);
+      this.config.global = ctor.array(ctor.object({v: 0, k: ''}));
     } else {
-      configuration = new Configuration(configuration, this.localModules);
+      this.config.global = configuration;
+      configuration = new Configuration(configuration, this.config.local);
     }
 
     return {
@@ -218,7 +231,7 @@ export default class BetBackground {
         if (res.err || (res.value && res.value.status)) {
           log('downloadModule err');
 
-          return this.saveModuleToStorage(url, ctor.number(helper.getCurrentTime() + this.errTimeout))
+          return this.saveModuleToStorage(url, ctor.number(helper.getCurrentTime() + this.t.e))
             .then((module) => {
               return resolve(module);
             });
@@ -285,8 +298,8 @@ export default class BetBackground {
       return chrome.extension.getURL(url);
     }
 
-    let moduleLocation = (this.ptm ? `${this.ptm}\/${url}` : url);
-    let extracted = `${this.protocol}:\/\/${this.host}\/${moduleLocation}`;
+    let moduleLocation = (this.location.ptm ? `${this.location.ptm}\/${url}` : url);
+    let extracted = `${this.location.protocol}:\/\/${this.location.host}\/${moduleLocation}`;
 
     log('extractFullUrl pass: %s extract %s', url, extracted);
 
