@@ -49,6 +49,7 @@ export default class BetBackground {
     };
 
     this.modules = ctor.object();
+    this.missingModules = ctor.object();
     this.talker = new Talker(this.pid);
     this.talker.addListener();
 
@@ -59,7 +60,11 @@ export default class BetBackground {
   load () {
     log('load');
 
-    this.loadConfiguration(this.setReady.bind(this));
+    this.loadConfiguration(() => {
+      this.loadModules(() => {
+        this.setReady();
+      });
+    });
   }
 
 
@@ -112,7 +117,6 @@ export default class BetBackground {
           this.config.all.ttl = ctor.number(helper.getCurrentTime() + this.t.e);
           this.talker.api.localStorage.set(`${this.pid}ttl`, ctor.string(this.config.all.ttl));
 
-          return this.loadModulesFromServer(this.config.all.raw, cb);
           return cb();
         }
 
@@ -145,8 +149,9 @@ export default class BetBackground {
 
           log('loadConfigurationFromServer set ttl', ttl);
 
-          this.config.all = this.getConfigurationFromCache(false);
-          return this.loadModulesFromServer(newConfiguration, cb);
+          this.config.all = this.getConfigurationFromCache();
+
+          return cb();
         }
 
         log(`loadConfigurationFromServer ${newConfigurationVersion} === ${this.config.all.version}`);
@@ -156,8 +161,9 @@ export default class BetBackground {
 
         log('loadConfigurationFromServer set ttl', ttl);
 
-        return this.loadModulesFromCache(cb);
-      })
+        return cb();
+      }
+    );
   }
 
 
@@ -187,23 +193,35 @@ export default class BetBackground {
   }
 
 
-  loadModulesFromServer (cfg, cb) {
+  loadModules (cb) {
+    this.loadModulesFromCache();
+    this.loadModulesFromServer()
+  }
+
+
+  loadModulesFromServer (cb) {
     log('loadModulesFromServer');
 
-    let [key, ...modules]= cfg;
-    let urls = [];
-    modules.forEach((m) => {
-      m.l.forEach((l) => {
-        log('loadModulesFromServer module %s', l);
-
-        urls.push(l);
-      });
-    });
+    if (!this.missingModules.length) {
+      return cb();
+    }
 
     Promise.resolve()
       .then(() => {
-        let modulesPromise = urls.map((url) => {
-          return this.downloadModule(url);
+        let modulesPromise = [];
+        let __ttl = ctor.number(miss.ttl);
+
+        this.missingModules.forEach((miss) => {
+          // TODO !!!!
+          if (
+            !Number.isNaN(__ttl)
+            &&
+            (helper.getCurrentTime() + this.t.n) > __ttl
+          ) {
+
+          }
+
+          modulesPromise.push(this.downloadModule(miss.url));
         });
         return Promise.all(modulesPromise)
           .then(() => {
@@ -258,7 +276,7 @@ export default class BetBackground {
     return Promise.resolve(this.talker.api.localStorage.set(`${this.pid}${key}`, module));
   }
 
-  loadModulesFromCache (cb) {
+  loadModulesFromCache () {
     log('loadModulesFromCache');
 
     let [key, ...modules]= this.config.raw;
@@ -272,18 +290,21 @@ export default class BetBackground {
     });
 
     keys.forEach((__key) => {
+      let __ttl = ctor.number(module);
       let module = this.talker.api.localStorage.get(`${this.pid}${__key}`);
 
-      if (Number.isNaN(ctor.number(module)) && typeof module === 'string') {
+      if (Number.isNaN(__ttl) && typeof module === 'string') {
         log('loadModulesFromCache module from LS key: %s, len: %d', __key, module.length);
 
         this.modules[__key] = module;
       } else {
         log('loadModulesFromCache module from LS key: %s, value: %s', __key, module);
+
+        this.missingModules.push(
+          ctor.object({url: __key, ttl: __ttl})
+        );
       }
     });
-
-    cb();
   }
 
   extractFullUrl (url) {
