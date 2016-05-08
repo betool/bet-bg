@@ -100,6 +100,12 @@ export default class BetBackground {
   loadConfigurationFromServer (cb) {
     log('loadConfigurationFromServer');
 
+    if (!this.location.host) {
+      this.config.all.ttl = ctor.number(helper.getCurrentTime() + this.t.e);
+      this.talker.api.localStorage.set(`${this.pid}ttl`, ctor.string(this.config.all.ttl));
+      return cb();
+    }
+
     this.talker.api.ajax.get(
       {
         url: `${this.location.protocol}:\/\/${this.location.host}/${this.location.ptc}`,

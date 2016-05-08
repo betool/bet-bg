@@ -8,18 +8,13 @@ if(chrome.runtime.onMessage) {
   log('bg script start');
 
   var brex = new Brex({
-    protocol : 'http',
-    host: 'localhost:8080',
-    pathToConfig: 'config.json',
-    pathToModule: '',
-    path: '/',
     timeout: 3000,
     errTimeout: 30000,
     pluginId: 'plugin1',
     localModules: [{
       f: 0,
-      r: 0,
-      h: '.+',
+      r: 1,
+      h: '^(www\\.)?drive2\\.ru$',
       a: 1,
       l: ['/module.js']
     }]

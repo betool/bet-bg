@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
-  "name": "replace__APP_NAME__replace",
+  "name": "Bet-bg",
   "version": "0.0.1",
-  "description": "replace__APP_DESCRIPTION__replace",
+  "description": "Bet-bg",
   "homepage_url": "http://www.localhost.cdn",
   "web_accessible_resources": ["./*"],
   "background": {
