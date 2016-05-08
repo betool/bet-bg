@@ -20,7 +20,6 @@ class Configuration {
 
     return this.cfg;
   }
-
 }
 
 
@@ -49,11 +48,11 @@ export default class BetBackground {
     };
 
     this.modules = ctor.object();
-    this.missingModules = ctor.object();
+    this.missingModules = ctor.array();
     this.talker = new Talker(this.pid);
-    this.talker.addListener();
 
-    this.config.all = this.getConfigurationFromCache();
+    this.talker.addListener();
+    this.getConfigurationFromCache();
   }
 
 
@@ -90,8 +89,6 @@ export default class BetBackground {
       log(`ttl is OK ${this.config.all.ttl} > ${now}`);
 
       return cb();
-
-      // return this.loadModulesFromCache(cb);
     }
 
     log(`ttl is BAD ${this.config.all.ttl} > ${now}`);
@@ -135,6 +132,7 @@ export default class BetBackground {
           return cb();
         }
 
+        this.config.global = newConfiguration;
         let newConfigurationVersion = newConfiguration[0].v;
         newConfiguration = newConfiguration.concat(this.config.local);
 
@@ -149,7 +147,7 @@ export default class BetBackground {
 
           log('loadConfigurationFromServer set ttl', ttl);
 
-          this.config.all = this.getConfigurationFromCache();
+          this.getConfigurationFromCache();
 
           return cb();
         }
@@ -179,23 +177,22 @@ export default class BetBackground {
       this.talker.api.localStorage.set(`${this.pid}ttl`, 0);
       this.config.global = ctor.array(ctor.object({v: 0, k: ''}));
     } else {
-      this.config.global = configuration;
-      configuration = new Configuration(configuration, this.config.local);
+      configuration = new Configuration(this.config.global, this.config.local);
     }
 
-    return {
+    this.config.all = {
       key: configuration[0].k,
       ttl: ctor.number(this.talker.api.localStorage.get(`${this.pid}ttl`) || 0),
       version: configuration[0].v,
       modules: [],
       raw: configuration
-    }
+    };
   }
 
 
   loadModules (cb) {
     this.loadModulesFromCache();
-    this.loadModulesFromServer()
+    this.loadModulesFromServer(cb);
   }
 
 
@@ -209,20 +206,13 @@ export default class BetBackground {
     Promise.resolve()
       .then(() => {
         let modulesPromise = [];
-        let __ttl = ctor.number(miss.ttl);
 
         this.missingModules.forEach((miss) => {
-          // TODO !!!!
-          if (
-            !Number.isNaN(__ttl)
-            &&
-            (helper.getCurrentTime() + this.t.n) > __ttl
-          ) {
-
+          if (miss.needLoad) {
+            modulesPromise.push(this.downloadModule(miss.url));
           }
-
-          modulesPromise.push(this.downloadModule(miss.url));
         });
+
         return Promise.all(modulesPromise)
           .then(() => {
             log('loadModulesFromServer done');
@@ -231,9 +221,9 @@ export default class BetBackground {
           });
       })
       .catch((err) => {
-        log('loadModulesFromServer err', err);
+        log('loadModulesFromServer err', err.stack || 'no stack', '\n', err);
 
-        return cb(false);
+        return cb();
       })
   }
 
@@ -250,14 +240,10 @@ export default class BetBackground {
           log('downloadModule err');
 
           return this.saveModuleToStorage(url, ctor.number(helper.getCurrentTime() + this.t.e))
-            .then((module) => {
-              return resolve(module);
-            });
+            .then(() => resolve());
         }
         return this.saveModuleToStorage(url, res.value)
-          .then((module) => {
-            return resolve(module);
-          });
+          .then(() => resolve());
       });
     })
   }
@@ -279,31 +265,30 @@ export default class BetBackground {
   loadModulesFromCache () {
     log('loadModulesFromCache');
 
-    let [key, ...modules]= this.config.raw;
-    let keys = [];
+    let [key, ...modules]= this.config.all.raw;
+
     modules.forEach((m) => {
       m.l.forEach((l) => {
         log('loadModulesFromCache module %s', l);
 
-        keys.push(l);
+        let module = this.talker.api.localStorage.get(`${this.pid}${l}`);
+        let __ttl = ctor.number(module);
+
+        if ('string' === typeof module && Number.isNaN(__ttl)) {
+          log('loadModulesFromCache module from LS key: %s, len: %d', l, module.length);
+
+          this.modules[l] = module;
+        } else {
+          log('loadModulesFromCache module from LS key: %s, value: %s', l, module);
+
+          this.missingModules.push(
+            ctor.object({
+              url: l,
+              needLoad: (helper.getCurrentTime() + this.t.n) > (__ttl || 0)
+            })
+          );
+        }
       });
-    });
-
-    keys.forEach((__key) => {
-      let __ttl = ctor.number(module);
-      let module = this.talker.api.localStorage.get(`${this.pid}${__key}`);
-
-      if (Number.isNaN(__ttl) && typeof module === 'string') {
-        log('loadModulesFromCache module from LS key: %s, len: %d', __key, module.length);
-
-        this.modules[__key] = module;
-      } else {
-        log('loadModulesFromCache module from LS key: %s, value: %s', __key, module);
-
-        this.missingModules.push(
-          ctor.object({url: __key, ttl: __ttl})
-        );
-      }
     });
   }
 
