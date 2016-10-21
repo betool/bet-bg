@@ -12,19 +12,29 @@ const envPlugin = new webpack.DefinePlugin({
 module.exports = {
   context: path.join(__dirname + '/src'),
   entry: {
-    bg: './modules/bg.js',
-    cs: './modules/cs.js',
-    module: './tests/testModule.js'
+    bg: './modules/bg.js'
+    // ,
+    // cs: './modules/cs.js',
+    // module: './tests/testModule.js'
   },
   output: {
     path: path.join(__dirname + '/build'),
     filename: '[name].js'
   },
   module: {
-    loaders: [{
-      test: /\.js/,
-      loader: 'babel?presets[]=es2015'
-    }]
+    loaders: [
+      {
+        test: /\.js/,
+        exclude: /node_modules/,
+        loader: 'babel',
+        query: {
+          presets: [
+            'es2015'
+          ]
+        }
+      }
+    ],
+    noParse: [new RegExp('node_modules/localforage/dist/localforage.js')]
   },
   plugins: [
     envPlugin
