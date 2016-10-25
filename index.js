@@ -69,7 +69,7 @@ class BetBackground {
 
   loadConfig () {
     return Promise.resolve()
-      .then(() => fetch('http://offline-news-api.herokuapp.com/stories'))
+      .then(() => fetch('http://localhost:3000/config.json'))
       .then(response => {
         if (response.status >= 400) {
           throw new Error('Bad response from server');
