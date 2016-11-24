@@ -7,7 +7,6 @@ import localforage from 'localforage';
 import BetConnector from 'bet-connector';
 // import Logger from 'bet-logger';
 
-
 // const log = new Logger('BET:bg');
 
 class BetBackground {
@@ -26,8 +25,8 @@ class BetBackground {
       modules: LRU({ maxAge: 1000 * 60 * 60 * 24 })
     };
 
-    this.connector = new BetConnector('chrome');
-    this.connector.addListener();
+    this.dealer = new BetConnector('chrome');
+    this.dealer.addListener();
   }
 
   run () {
