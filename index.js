@@ -4,6 +4,7 @@ import LRU from 'lru-cache';
 import Promise from 'bluebird';
 import fetch from 'isomorphic-fetch';
 import localforage from 'localforage';
+import BetConnector from 'bet-connector';
 // import Logger from 'bet-logger';
 
 
@@ -24,6 +25,9 @@ class BetBackground {
       config: LRU({ maxAge: app.ttl}),
       modules: LRU({ maxAge: 1000 * 60 * 60 * 24 })
     };
+
+    this.connector = new BetConnector('chrome');
+    this.connector.addListener();
   }
 
   run () {
