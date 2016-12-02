@@ -1,15 +1,9 @@
-import Logger from 'bet-logger';
-import Crex from 'bet-cs';
+'use strict';
 
+import BetCs from 'bet-cs';
 
-const log = new Logger(`Brex:cs:${window.location.hostname}`);
-
-if(chrome.runtime.onMessage) {
-  log('cs script start');
-
-  var crex = new Crex({
-    pluginId: "plugin1"
-  });
-
-  crex.load();
+if (chrome.runtime.onMessage) {
+  console.log('cs script start');
+  const betBg = new BetCs();
+  betBg.load();
 }

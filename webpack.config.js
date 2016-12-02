@@ -12,9 +12,8 @@ const envPlugin = new webpack.DefinePlugin({
 module.exports = {
   context: path.join(__dirname + '/src'),
   entry: {
-    bg: './modules/bg.js'
-    // ,
-    // cs: './modules/cs.js',
+    bg: './modules/bg.js',
+    cs: './modules/cs.js'
     // module: './tests/testModule.js'
   },
   output: {
