@@ -25,7 +25,7 @@ class BetBackground {
       modules: LRU({ maxAge: 1000 * 60 * 60 * 24 })
     };
 
-    this.dealer = new BetConnector('chrome');
+    this.dealer = new BetConnector('chrome', this);
     this.dealer.addListener();
   }
 
@@ -40,7 +40,11 @@ class BetBackground {
   startup () {
     return Promise.resolve()
       .then(() => this.getConfig())
-      .then(config => this.getModules(config));
+      .then(config => this.getModules(config))
+      .then(modules => {
+        console.log('modules', this.cache.modules.values());
+        console.log('config', this.cache.config.get('config'));
+      });
   }
 
   getConfig () {
