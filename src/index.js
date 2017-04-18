@@ -11,18 +11,17 @@ import BetConnector from 'bet-connector';
 
 class BetBackground {
 
-  constructor (app) {
-    app = app || {};
+  constructor (app = {}) {
     app.ttl = app.ttl || 1000 * 60 * 1;
 
     this.ttl = app.ttl;
     this.storage = {
       config: localforage.createInstance({ name: 'config' }),
-      modules: localforage.createInstance({ name: 'modules' })
+      modules: localforage.createInstance({ name: 'modules' }),
     };
     this.cache = {
-      config: LRU({ maxAge: app.ttl}),
-      modules: LRU({ maxAge: 1000 * 60 * 60 * 24 })
+      config: LRU({ maxAge: app.ttl }),
+      modules: LRU({ maxAge: 1000 * 60 * 60 * 24 }),
     };
 
     this.dealer = new BetConnector('chrome', this);
@@ -32,7 +31,7 @@ class BetBackground {
   run () {
     return Promise.resolve()
       .then(() => this.startup())
-      .catch(err => {
+      .catch((err) => {
         console.log('Error:', err.stack, err);
       });
   }
@@ -41,7 +40,7 @@ class BetBackground {
     return Promise.resolve()
       .then(() => this.getConfig())
       .then(config => this.getModules(config))
-      .then(modules => {
+      .then(() => {
         console.log('modules', this.cache.modules.values());
         console.log('config', this.cache.config.get('config'));
       });
@@ -57,12 +56,12 @@ class BetBackground {
 
         return Promise.resolve()
           .then(() => this.storage.config.getItem('config'))
-          .then(config => {
+          .then((config) => {
             // config not found in storage
             if (!config) {
               return this.loadConfig();
             }
-            let ttl = config.__ttl - new Date().valueOf();
+            const ttl = config.__ttl - new Date().valueOf();
 
             this.cache.config.set('config', config, ttl);
 
@@ -76,7 +75,7 @@ class BetBackground {
             return this.loadConfig(config);
           });
       })
-      .then(config => {
+      .then((config) => {
         console.log('config', config);
         return Promise.resolve(config);
       });
@@ -85,13 +84,13 @@ class BetBackground {
   loadConfig (oldConfig) {
     return Promise.resolve()
       .then(() => fetch('http://localhost:3000/config.json'))
-      .then(response => {
-        if (response.status >= 400) {
+      .then((response) => {
+        if (400 <= response.status) {
           throw new Error('Bad response from server');
         }
         return response.json();
       })
-      .then(config => {
+      .then((config) => {
         if (
           oldConfig
           &&
@@ -114,7 +113,8 @@ class BetBackground {
 
         return Promise.resolve(config);
       })
-      .then(config => {
+      .then((config) => {
+        console.log('111!');
         return Promise.resolve()
           .then(() => {
             config.__ttl = new Date().valueOf() + this.ttl;
@@ -166,7 +166,7 @@ class BetBackground {
 
     return Promise.resolve()
       .then(() => this.storage.modules.getItem(link))
-      .then(text => {
+      .then((text) => {
         // link text not found in storage
         if (!text) {
           return this.loadModuleElement(link);
@@ -188,19 +188,19 @@ class BetBackground {
   loadModuleElement (link) {
     return Promise.resolve()
       .then(() => fetch(link))
-      .then(response => {
-        if (response.status >= 400) {
+      .then((response) => {
+        if (400 <= response.status) {
           throw new Error('Bad response from server');
         }
         return response.text();
       })
-      .then(text => {
+      .then((text) => {
         console.log(`from server: ${link}`);
         return Promise.resolve()
           .then(() => this.cache.modules.set(link, text))
           .then(() => this.storage.modules.setItem(link, text));
       });
   }
-};
+}
 
 export default BetBackground;
