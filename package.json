@@ -16,7 +16,7 @@
   "scripts": {
     "clean": "rimraf lib",
     "build": "babel src --out-dir lib",
-    "start": "babel-node src/index.js",
+    "start": "babel src --watch --out-dir lib",
     "lint": "eslint .",
     "test": "echo \"Error: no test specified\" && exit 0",
     "prepublish": "npm run clean && npm run build",
