@@ -5,9 +5,9 @@ import Promise from 'bluebird';
 import fetch from 'isomorphic-fetch';
 import localforage from 'localforage';
 import BetConnector from 'bet-connector';
-// import Logger from 'bet-logger';
+import Logger from 'bet-logger';
 
-// const log = new Logger('BET:bg');
+const log = new Logger('BET:bg');
 
 class BetBackground {
 
@@ -39,49 +39,59 @@ class BetBackground {
   startup () {
     return Promise.resolve()
       .then(() => this.getConfig())
-      .then(config => this.getModules(config))
-      .then(() => {
-        console.log('modules', this.cache.modules.values());
-        console.log('config', this.cache.config.get('config'));
-      });
+      .then(() => this.getModules());
   }
 
   getConfig () {
     return Promise.resolve()
-      .then(() => {
-        if (this.cache.config.has('config')) {
-          console.log('from cache');
-          return Promise.resolve(this.cache.config.get('config'));
+      .then(() => this.getConfigCache())
+      .then((config) => {
+        if (config) {
+          return config;
         }
 
-        return Promise.resolve()
-          .then(() => this.storage.config.getItem('config'))
-          .then((config) => {
-            // config not found in storage
-            if (!config) {
-              return this.loadConfig();
-            }
-            const ttl = config.__ttl - new Date().valueOf();
-
-            this.cache.config.set('config', config, ttl);
-
-            // config found and fresh
-            if (this.cache.config.has('config')) {
-              console.log('from ls', ttl);
-              return Promise.resolve(this.cache.config.get('config'));
-            }
-
-            // config found, but isn`t fresh, load new from server
-            return this.loadConfig(config);
-          });
+        return this.getConfigStorage();
       })
       .then((config) => {
-        console.log('config', config);
-        return Promise.resolve(config);
+        if (config) {
+          return config;
+        }
+
+        return this.loadConfigInternal();
+      })
+      .then((originalConfig) => {
+        const config = originalConfig.slice();
+        config.shift();
+        return config;
       });
   }
 
-  loadConfig (oldConfig) {
+  getConfigCache () {
+    if (this.cache.config.has('config')) {
+      log('from cache');
+      return Promise.resolve(this.cache.config.get('config'));
+    }
+  }
+
+  getConfigStorage () {
+    return this.storage.config.getItem('config')
+      .then((storageConfig) => {
+        if (storageConfig) {
+          log('from ls');
+
+          const ttl = storageConfig[0].__ttl - new Date().valueOf();
+          this.cache.config.set('config', storageConfig, ttl);
+
+          if (this.cache.config.has('config')) {
+            return this.getConfigCache();
+          }
+
+          return this.loadConfigInternal(storageConfig);
+        }
+      });
+  }
+
+  loadConfigInternal (oldConfig) {
     return Promise.resolve()
       .then(() => fetch('http://localhost:3000/config.json'))
       .then((response) => {
@@ -91,6 +101,8 @@ class BetBackground {
         return response.json();
       })
       .then((config) => {
+        log('from Internal');
+
         if (
           oldConfig
           &&
@@ -111,37 +123,36 @@ class BetBackground {
           return this.wipeModules(config);
         }
 
-        return Promise.resolve(config);
+        return config;
       })
       .then((config) => {
-        console.log('111!');
+        config[0].__ttl = new Date().valueOf() + this.ttl;
         return Promise.resolve()
-          .then(() => {
-            config.__ttl = new Date().valueOf() + this.ttl;
-            this.cache.config.set('config', config, this.ttl);
-            console.log('from server');
-            return Promise.resolve();
-          })
+          .then(() => this.cache.config.set('config', config, this.ttl))
           .then(() => this.storage.config.setItem('config', config))
-          .then(() => Promise.resolve(config));
+          .then(() => config);
       });
+      // TODO: catch error
   }
 
   wipeModules (config) {
-    console.log('wipe!');
+    log('wipe!');
     return Promise.resolve()
       .then(() => this.cache.modules.reset())
       .then(() => this.storage.modules.clear())
       .then(() => Promise.resolve(config));
   }
 
-  getModules (config) {
+  getModules () {
     return Promise.resolve()
-      .then(() => {
-        // remove system config element
-        config.shift();
-        const parallel = config.map(moduleConfig => this.getModule(moduleConfig));
-        return Promise.all(parallel);
+      .then(() => this.getConfigCache())
+      .then((cacheConfig) => {
+        if (cacheConfig) {
+          const config = cacheConfig.slice();
+          config.shift();
+          const parallel = config.map(moduleConfig => this.getModule(moduleConfig));
+          return Promise.all(parallel);
+        }
       });
   }
 
@@ -160,7 +171,7 @@ class BetBackground {
 
   getModuleElement (link) {
     if (this.cache.modules.has(link)) {
-      console.log(`from cache: ${link}`);
+      log(`from cache: ${link}`);
       return Promise.resolve();
     }
 
@@ -176,7 +187,7 @@ class BetBackground {
 
         // link text found and fresh
         if (this.cache.modules.has(link)) {
-          console.log(`from ls: ${link}`);
+          log(`from ls: ${link}`);
           return Promise.resolve();
         }
 
@@ -195,7 +206,7 @@ class BetBackground {
         return response.text();
       })
       .then((text) => {
-        console.log(`from server: ${link}`);
+        log(`from server: ${link}`);
         return Promise.resolve()
           .then(() => this.cache.modules.set(link, text))
           .then(() => this.storage.modules.setItem(link, text));
