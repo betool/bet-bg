@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "bet-connector": "0.0.1",
+    "bet-logger": "0.0.2",
     "bluebird": "3.5.0",
     "isomorphic-fetch": "2.2.1",
     "localforage": "1.5.0",
