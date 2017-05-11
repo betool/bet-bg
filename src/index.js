@@ -103,44 +103,43 @@ class BetBackground {
       .then((config) => {
         log('from Internal');
 
-        if (
-          oldConfig
-          &&
-          (
-            oldConfig[0] && config[0]
-          )
-          &&
-          (
-            'number' === typeof oldConfig[0].v
-            &&
-            'number' === typeof config[0].v
-          )
-          &&
-          (
-            oldConfig[0].v !== config[0].v
-          )
-        ) {
-          return this.wipeModules(config);
-        }
-
-        return config;
-      })
-      .then((config) => {
         config[0].__ttl = new Date().valueOf() + this.ttl;
+
         return Promise.resolve()
           .then(() => this.cache.config.set('config', config, this.ttl))
           .then(() => this.storage.config.setItem('config', config))
+          .then(() => {
+            if (
+              oldConfig
+              &&
+              (
+                oldConfig[0] && config[0]
+              )
+              &&
+              (
+                'number' === typeof oldConfig[0].v
+                &&
+                'number' === typeof config[0].v
+              )
+              &&
+              (
+                oldConfig[0].v !== config[0].v
+              )
+            ) {
+              return this.wipeModules();
+            }
+          })
           .then(() => config);
       });
       // TODO: catch error
   }
 
-  wipeModules (config) {
+  wipeModules () {
     log('wipe!');
     return Promise.resolve()
       .then(() => this.cache.modules.reset())
       .then(() => this.storage.modules.clear())
-      .then(() => Promise.resolve(config));
+      .then(() => this.getModules());
   }
 
   getModules () {
