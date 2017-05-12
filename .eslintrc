@@ -2,7 +2,6 @@
   "extends": "airbnb",
   "parser": "babel-eslint",
   "rules": {
-    "no-console": 0,
     "space-before-function-paren": ["error", "always"],
     "no-param-reassign": ["error", { "props": false }],
     "yoda": ["error", "always"],

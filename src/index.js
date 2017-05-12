@@ -61,7 +61,7 @@ class BetBackground {
     return Promise.resolve()
       .then(() => this.startup())
       .catch((err) => {
-        console.log('Error:', err.stack, err);
+        log('Error:', err.stack, err);
       });
   }
 
