@@ -1,3 +1,5 @@
+/* global chrome:true */
+
 'use strict';
 
 import LRU from 'lru-cache';
@@ -5,6 +7,7 @@ import Promise from 'bluebird';
 import fetch from 'isomorphic-fetch';
 import localforage from 'localforage';
 import BetConnector from 'bet-connector';
+import helper from 'bet-helper';
 import Logger from 'bet-logger';
 
 const log = new Logger('BET:bg');
@@ -13,19 +16,45 @@ class BetBackground {
 
   constructor (app = {}) {
     app.ttl = app.ttl || 1000 * 60 * 1;
+    app.ettl = app.ettl || 1000 * 60 * 1;
 
     this.ttl = app.ttl;
+    this.ettl = app.ettl;
+
+    this.location = helper.buildLocation(app.location);
+
     this.storage = {
       config: localforage.createInstance({ name: 'config' }),
       modules: localforage.createInstance({ name: 'modules' }),
     };
     this.cache = {
+      inner: LRU({ maxAge: 0 }),
       config: LRU({ maxAge: app.ttl }),
-      modules: LRU({ maxAge: 1000 * 60 * 60 * 24 }),
+      modules: LRU({ maxAge: 0 }),
     };
+
+    if (Array.isArray(app.config)) {
+      this.cache.inner.set('inner', app.config);
+    }
 
     this.dealer = new BetConnector('chrome', this);
     this.dealer.addListener();
+  }
+
+  get config () {
+    let original = [];
+
+    if (this.cache.inner.has('inner')) {
+      const inner = this.cache.inner.get('inner');
+      original = original.concat(inner);
+    }
+    if (this.cache.config.has('config')) {
+      const config = this.cache.config.get('config').slice();
+      config.shift();
+      original = original.concat(config);
+    }
+
+    return original;
   }
 
   run () {
@@ -39,7 +68,10 @@ class BetBackground {
   startup () {
     return Promise.resolve()
       .then(() => this.getConfig())
-      .then(() => this.getModules());
+      .then(() => this.getModules())
+      .then(() => {
+        log('config', this.config);
+      });
   }
 
   getConfig () {
@@ -59,11 +91,16 @@ class BetBackground {
 
         return this.loadConfigInternal();
       })
-      .then((originalConfig) => {
-        const config = originalConfig.slice();
-        config.shift();
-        return config;
-      });
+      .then(() => this.config);
+  }
+
+  mixInnerConfig (config) {
+    if (this.cache.inner.has('inner')) {
+      const inner = this.cache.inner.get('inner');
+      return inner.concat(config);
+    }
+
+    return config;
   }
 
   getConfigCache () {
@@ -92,8 +129,12 @@ class BetBackground {
   }
 
   loadConfigInternal (oldConfig) {
+    if (!this.location.config) {
+      return [];
+    }
+
     return Promise.resolve()
-      .then(() => fetch('http://localhost:3000/config.json'))
+      .then(() => fetch(this.location.config))
       .then((response) => {
         if (400 <= response.status) {
           throw new Error('Bad response from server');
@@ -143,16 +184,8 @@ class BetBackground {
   }
 
   getModules () {
-    return Promise.resolve()
-      .then(() => this.getConfigCache())
-      .then((cacheConfig) => {
-        if (cacheConfig) {
-          const config = cacheConfig.slice();
-          config.shift();
-          const parallel = config.map(moduleConfig => this.getModule(moduleConfig));
-          return Promise.all(parallel);
-        }
-      });
+    const parallel = this.config.map(moduleConfig => this.getModule(moduleConfig));
+    return Promise.all(parallel);
   }
 
   getModule (moduleConfig) {
@@ -196,8 +229,9 @@ class BetBackground {
   }
 
   loadModuleElement (link) {
+    const url = this.extractFullUrl(link);
     return Promise.resolve()
-      .then(() => fetch(link))
+      .then(() => fetch(url))
       .then((response) => {
         if (400 <= response.status) {
           throw new Error('Bad response from server');
@@ -210,6 +244,25 @@ class BetBackground {
           .then(() => this.cache.modules.set(link, text))
           .then(() => this.storage.modules.setItem(link, text));
       });
+  }
+
+  extractFullUrl (url) {
+    if (/^https?:\/\//i.test(url)) {
+      return url;
+    }
+    if (/^\//.test(url)) {
+      // TODO: add all platform polifill
+      return chrome.extension.getURL(url);
+    }
+
+    const moduleLocation = this.location.ptm ? `${this.location.ptm}/${url}` : url;
+    let extracted = `${this.location.protocol}://${this.location.hostname}`;
+    if (this.location.port) {
+      extracted += `:${this.location.port}`;
+    }
+    extracted += `/${moduleLocation}`;
+
+    return extracted;
   }
 }
 
