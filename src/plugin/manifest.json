@@ -4,16 +4,17 @@
   "version": "0.0.1",
   "description": "Bet-bg",
   "homepage_url": "http://www.localhost.cdn",
-  "web_accessible_resources": ["./*"],
   "background": {
-    "scripts": ["bg.js"]
+    "scripts": ["./bg/bg.js"]
   },
-  "content_scripts": [{
-    "js": ["cs.js"],
-    "run_at": "document_start",
-    "matches": ["<all_urls>"],
-    "all_frames": true
-  }],
+  "content_scripts": [
+    {
+      "js": ["./cs/cs.js"],
+      "run_at": "document_start",
+      "matches": ["<all_urls>"],
+      "all_frames": true
+    }
+  ],
   "icons": {
     "128": "img/icon.png"
   },

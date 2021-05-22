@@ -1,11 +1,18 @@
 'use strict';
 
 const del = require('delete');
-const { series, src, dest } = require('gulp');
+const ts = require('gulp-typescript');
+const sourcemaps = require('gulp-sourcemaps');
+const { series, parallel, src, dest } = require('gulp');
+
+const tsProject = ts.createProject('tsconfig.build.json');
 
 const config = {
   src: 'src',
   dest: 'build',
+  get modules() {
+    return `${this.src}/**/{bg,cs}.ts`;
+  },
   get plugin() {
     return `${this.src}/plugin`;
   },
@@ -22,12 +29,16 @@ function copy() {
   return pluginStaticPath.pipe(buildPath);
 }
 
-function build(cb) {
-  cb();
+function typescript() {
+  return tsProject.src().pipe(sourcemaps.init()).pipe(tsProject()).js.pipe(sourcemaps.write('.')).pipe(dest(config.dest));
+}
+
+function build() {
+  return series(clean, parallel(copy, typescript));
 }
 
 exports.clean = clean;
 exports.copy = copy;
-exports.build = build;
+exports.typescript = typescript;
 
-exports.default = series(clean, copy, build);
+exports.default = build();
