@@ -1,10 +1,12 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2020",
     "module": "commonjs",
     "strict": true,
+    "moduleResolution": "Node",
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": "src/"
   }
 }

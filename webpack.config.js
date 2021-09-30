@@ -1,58 +1,88 @@
-'use strict';
-
-const NODE_ENV = process.env.NODE_ENV || 'production';
-
 const path = require('path');
+const { IgnorePlugin } = require('webpack');
 const webpack = require('webpack');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
-const envPlugin = new webpack.DefinePlugin({
-  ENV_BROWSER: JSON.stringify('chrome')
-});
+const IN_DEVELOPMENT = process.env.NODE_ENV !== 'production';
 
-module.exports = {
-  context: path.join(__dirname + '/src'),
+const config = {
+  target: 'web',
+  cache: false,
   entry: {
-    bg: './modules/bg.js',
-    cs: './modules/cs.js',
-    module: './tests/testModule.js'
+    bg: path.join(__dirname, './src/modules/bg/bg.ts'),
+    cs: path.join(__dirname, './src/modules/cs/cs.ts'),
   },
   output: {
-    path: path.join(__dirname + '/build'),
-    filename: '[name].js'
+    path: path.join(__dirname, 'dist'),
+    filename: (pathData) => {
+      if (['bg', 'cs'].includes(pathData.runtime)) {
+        return `${pathData.runtime}/[name].js`;
+      }
+      return '[name].js';
+    },
+    clean: true,
+  },
+  resolve: {
+    extensions: ['.ts', '.tsx', '.js'],
+    plugins: [new TsconfigPathsPlugin()],
   },
   module: {
-    loaders: [{
-      test: /\.js/,
-      loader: 'babel?presets[]=es2015'
-    }]
+    rules: [
+      {
+        test: /\.tsx?$/,
+        use: ['babel-loader', '@linaria/webpack-loader'],
+        exclude: /node_modules/,
+      },
+      {
+        test: /\.svg$/,
+        use: ['@svgr/webpack', 'svgo-loader'],
+      },
+      {
+        test: /\.css$/,
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+          },
+          {
+            loader: 'css-loader',
+            options: {
+              url: false,
+              sourceMap: IN_DEVELOPMENT,
+            },
+          },
+        ],
+      },
+    ],
   },
   plugins: [
-    envPlugin
+    new IgnorePlugin({
+      resourceRegExp: /^ws$/,
+    }),
+    new MiniCssExtractPlugin({
+      filename: 'styles.css',
+    }),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: path.join(__dirname, 'src/plugin'),
+          to: path.join(__dirname, 'dist'),
+          context: 'public',
+        },
+      ],
+    }),
+    new webpack.ProvidePlugin({
+      process: 'process/browser',
+    }),
   ],
-  resolve: {
-    modulesDirectories: ['node_modules'],
-    extensions: ['', '.js']
-  },
-  resolveLoader: {
-    modulesDirectories: ['node_modules'],
-    moduleTemplates: ['*-loader', '*'],
-    extensions: ['', '.js']
-  },
-  devtool: NODE_ENV === 'development' ? 'source-map' : null,
-  watch: NODE_ENV === 'development',
-  watchOptions: {
-    aggregateTimeout: 100
-  }
+  externals: ['fs'],
 };
 
-if (NODE_ENV === 'production') {
-  module.exports.plugins.push(
-      new webpack.optimize.UglifyJsPlugin({
-        compress: {
-          warnings: false,
-          drop_console: true,
-          unsafe: true
-        }
-      })
-  );
-}
+module.exports = (env, argv) => {
+  if (argv.mode === 'development') {
+    config.devtool = 'inline-source-map';
+  }
+
+  return config;
+};
