@@ -1,5 +1,7 @@
 import type { PluginConfig } from './interfaces';
 
+import { Service } from 'typedi';
+
 const DEFAULT_CONFIG: PluginConfig = {
   version: '0.0.1',
   modules: [
@@ -12,6 +14,7 @@ const DEFAULT_CONFIG: PluginConfig = {
   ],
 };
 
+@Service()
 export class ConfigService {
   private readonly configKey: string = 'CONFIG_KEY';
   private readonly defaultConfig: PluginConfig = DEFAULT_CONFIG;

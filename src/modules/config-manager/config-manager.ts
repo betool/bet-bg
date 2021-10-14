@@ -1,14 +1,23 @@
+import { Service, Inject } from 'typedi';
 import { ApiClient } from 'modules/api-client';
 import { ConfigService } from 'modules/config-service';
 
+@Service()
 export class ConfigManager {
-  constructor(private readonly apiClient: ApiClient, private readonly configService: ConfigService) {}
+  constructor(
+    @Inject()
+    private readonly apiClient: ApiClient,
+    @Inject()
+    private readonly configService: ConfigService,
+  ) {}
 
   public async fetchAndUpdate() {
     const remoteConfig = await this.apiClient.fetch();
     const localConfig = this.configService.read();
 
     if (localConfig.version !== remoteConfig.version) {
+      // TODO: rm ignore, fix type
+      // @ts-ignore
       this.configService.write(remoteConfig);
     }
   }

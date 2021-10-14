@@ -1,8 +1,16 @@
+import { Service, Inject } from 'typedi';
+
 import { ApiClient } from 'modules/api-client';
 import { ConfigService } from 'modules/config-service';
 
+@Service()
 export class ModuleManager {
-  constructor(private readonly apiClient: ApiClient, private readonly configService: ConfigService) {}
+  constructor(
+    @Inject()
+    private readonly apiClient: ApiClient,
+    @Inject()
+    private readonly configService: ConfigService,
+  ) {}
 
   public async init() {
     const config = this.configService.read();

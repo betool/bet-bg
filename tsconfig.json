@@ -1,12 +1,20 @@
 {
   "compilerOptions": {
-    "target": "es2020",
     "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "es2018",
+    "lib": ["es2018"],
+    "outDir": "build/node",
+    "rootDirs": ["./src"],
+    "baseUrl": "src/",
     "strict": true,
-    "moduleResolution": "Node",
+    "sourceMap": true,
+    "inlineSources": true,
+    "removeComments": false,
     "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "baseUrl": "src/"
-  }
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "exclude": ["build", "node_modules", "sample", "**/*.spec.ts", "test/**"]
 }

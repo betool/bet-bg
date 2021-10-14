@@ -1,20 +1,18 @@
-/// <reference types="chrome"/>
+import 'reflect-metadata';
 
-import { ApiClient } from '../api-client';
+import { Container, Inject, Service } from 'typedi';
+
 import { ModuleManager } from '../module-manager';
 import { ConfigManager } from '../config-manager';
-import { ConfigService } from '../config-service';
 
+@Service()
 class BackgroundScript {
-  private readonly configManager: ConfigManager;
-  private readonly moduleManager: ModuleManager;
-
-  constructor() {
-    const apiClient = new ApiClient();
-    const configService = new ConfigService();
-    this.configManager = new ConfigManager(apiClient, configService);
-    this.moduleManager = new ModuleManager(apiClient, configService);
-  }
+  constructor(
+    @Inject()
+    private readonly configManager: ConfigManager,
+    @Inject()
+    private readonly moduleManager: ModuleManager,
+  ) {}
 
   public async init(): Promise<void> {
     await this.configManager.fetchAndUpdate();
@@ -22,7 +20,7 @@ class BackgroundScript {
   }
 }
 
-const backgroundScript = new BackgroundScript();
+const backgroundScript = Container.get(BackgroundScript);
 backgroundScript.init();
 
 console.log('bg');

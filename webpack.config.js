@@ -32,7 +32,7 @@ const config = {
     rules: [
       {
         test: /\.tsx?$/,
-        use: ['babel-loader', '@linaria/webpack-loader'],
+        use: ['babel-loader'],
         exclude: /node_modules/,
       },
       {
@@ -71,9 +71,6 @@ const config = {
           context: 'public',
         },
       ],
-    }),
-    new webpack.ProvidePlugin({
-      process: 'process/browser',
     }),
   ],
   externals: ['fs'],
