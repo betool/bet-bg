@@ -1,8 +1,22 @@
-import { Service } from 'typedi';
+import type { PluginConfig } from '../config-service/interfaces';
+
+import { Inject, Service } from 'typedi';
+import { HttpClient } from '../http-client';
 
 @Service()
 export class ApiClient {
-  public async fetch() {
-    return { version: '1.1.1' };
+  constructor(
+    @Inject()
+    private readonly httpClient: HttpClient,
+  ) {}
+
+  public async configRead() {
+    try {
+      const { data } = await this.httpClient.get<PluginConfig>('config');
+      return data;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 }

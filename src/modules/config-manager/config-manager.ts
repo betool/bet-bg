@@ -12,7 +12,7 @@ export class ConfigManager {
   ) {}
 
   public async fetchAndUpdate() {
-    const remoteConfig = await this.apiClient.fetch();
+    const remoteConfig = await this.apiClient.configRead();
     const localConfig = this.configService.read();
 
     if (localConfig.version !== remoteConfig.version) {
