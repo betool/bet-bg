@@ -22,8 +22,6 @@ export class ModuleManager {
       for (const pluginModule of config.modules) {
         if (Array.isArray(pluginModule.sources)) {
           for (const source of pluginModule.sources) {
-            // TODO: Implement api client methods
-            // TODO: Implement LocalStorage wrapper
             await this.fetchAndStoreSource(source);
           }
         }
