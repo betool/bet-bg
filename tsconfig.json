@@ -1,13 +1,13 @@
 {
+  "extends": "./tsconfig-checks.json",
   "compilerOptions": {
     "module": "commonjs",
     "moduleResolution": "node",
     "target": "es2018",
-    "lib": ["es2018"],
+    "lib": ["es2018", "DOM"],
     "outDir": "build/node",
     "rootDirs": ["./src"],
     "baseUrl": "src/",
-    "strict": true,
     "sourceMap": true,
     "inlineSources": true,
     "removeComments": false,

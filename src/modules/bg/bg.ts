@@ -15,8 +15,11 @@ class BackgroundScript {
   ) {}
 
   public async init(): Promise<void> {
-    await this.configManager.fetchAndUpdate();
-    await this.moduleManager.init();
+    const configWasChanged = await this.configManager.fetchAndUpdate();
+
+    if (configWasChanged) {
+      await this.moduleManager.init();
+    }
   }
 }
 

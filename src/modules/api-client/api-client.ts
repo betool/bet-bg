@@ -10,7 +10,7 @@ export class ApiClient {
     private readonly httpClient: HttpClient,
   ) {}
 
-  public async configRead() {
+  public async configRead(): Promise<PluginConfig> {
     try {
       const { data } = await this.httpClient.get<PluginConfig>('config');
       return data;

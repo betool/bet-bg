@@ -1,6 +1,6 @@
 import { Service } from 'typedi';
 import MockAdapter from 'axios-mock-adapter';
-import { Axios, AxiosRequestConfig } from 'axios';
+import axios, { Axios, AxiosInstance, AxiosRequestConfig } from 'axios';
 
 @Service()
 export class HttpClient extends Axios {
@@ -25,5 +25,13 @@ export class HttpClient extends Axios {
       ],
     };
     mock.onGet('/config').reply(200, config);
+  }
+
+  createHttpClient(axiosRequestConfig?: AxiosRequestConfig): AxiosInstance {
+    if (typeof axiosRequestConfig === 'undefined') {
+      return axios;
+    }
+
+    return axios.create(axiosRequestConfig);
   }
 }

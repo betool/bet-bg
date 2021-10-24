@@ -11,14 +11,16 @@ export class ConfigManager {
     private readonly configService: ConfigService,
   ) {}
 
-  public async fetchAndUpdate() {
+  public async fetchAndUpdate(): Promise<boolean> {
     const remoteConfig = await this.apiClient.configRead();
-    const localConfig = this.configService.read();
+    const localConfig = await this.configService.read();
 
-    if (localConfig.version !== remoteConfig.version) {
-      // TODO: rm ignore, fix type
-      // @ts-ignore
-      this.configService.write(remoteConfig);
+    const configWasChanged = localConfig.version !== remoteConfig.version;
+
+    if (configWasChanged) {
+      await this.configService.write(remoteConfig);
     }
+
+    return configWasChanged;
   }
 }

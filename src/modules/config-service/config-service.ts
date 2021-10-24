@@ -1,6 +1,7 @@
 import type { PluginConfig } from './interfaces';
 
-import { Service } from 'typedi';
+import { Inject, Service } from 'typedi';
+import { StorageManager } from 'modules/storage-manager';
 
 const DEFAULT_CONFIG: PluginConfig = {
   version: '0.0.1',
@@ -18,20 +19,21 @@ const DEFAULT_CONFIG: PluginConfig = {
 export class ConfigService {
   private readonly configKey: string = 'CONFIG_KEY';
   private readonly defaultConfig: PluginConfig = DEFAULT_CONFIG;
-  private readonly defaultConfigString: string;
 
-  constructor() {
-    this.defaultConfigString = JSON.stringify(this.defaultConfig);
-  }
+  constructor(
+    @Inject()
+    private readonly storageManager: StorageManager,
+  ) {}
 
-  public read(): PluginConfig {
-    const configValue = window.localStorage.getItem(this.configKey) ?? this.defaultConfigString;
-
+  public async read(): Promise<PluginConfig> {
     let config: PluginConfig = this.defaultConfig;
 
     try {
-      config = JSON.parse(configValue);
-    } catch (error: unknown) {
+      const configFromStorage = await this.storageManager.getItem<PluginConfig>(this.configKey);
+      if (configFromStorage !== null) {
+        config = configFromStorage;
+      }
+    } catch (error) {
       console.log('Config error', error);
     }
 
@@ -40,9 +42,8 @@ export class ConfigService {
     return config;
   }
 
-  public write(config: PluginConfig): void {
+  public async write(config: PluginConfig): Promise<void> {
+    await this.storageManager.setItem(this.configKey, config);
     console.log('write', config);
-    const configValue = JSON.stringify(config);
-    window.localStorage.setItem(this.configKey, configValue);
   }
 }
