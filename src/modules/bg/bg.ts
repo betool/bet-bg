@@ -2,6 +2,7 @@ import 'reflect-metadata';
 
 import { Container, Inject, Service } from 'typedi';
 
+import { MessageManager } from '../message-manager';
 import { ModuleManager } from '../module-manager';
 import { ConfigManager } from '../config-manager';
 
@@ -12,7 +13,11 @@ class BackgroundScript {
     private readonly configManager: ConfigManager,
     @Inject()
     private readonly moduleManager: ModuleManager,
-  ) {}
+    @Inject()
+    private readonly messageManager: MessageManager,
+  ) {
+    this.messageManager.addListener();
+  }
 
   public async init(): Promise<void> {
     const configWasChanged = await this.configManager.fetchAndUpdate();
