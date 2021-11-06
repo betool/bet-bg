@@ -1,17 +1,17 @@
 import { MessageReasonEnum } from 'modules/constants';
 import { Service } from 'typedi';
 
-import { ExtensionMessage } from './interfaces';
+import { ControllerMessage } from './interfaces';
 
 @Service()
-export class MessageManager {
+export class MessageController {
   public async addListener() {
     console.log('addListener');
     chrome.runtime.onMessage.addListener(this.listenerHandler);
   }
 
   private listenerHandler(
-    message: ExtensionMessage,
+    message: ControllerMessage,
     sender: chrome.runtime.MessageSender,
     sendResponse: (response?: any) => void,
   ): boolean {

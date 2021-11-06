@@ -2,7 +2,7 @@ import 'reflect-metadata';
 
 import { Container, Inject, Service } from 'typedi';
 
-import { MessageManager } from '../message-manager';
+import { MessageController } from '../message-controller';
 import { ModuleManager } from '../module-manager';
 import { ConfigManager } from '../config-manager';
 
@@ -14,9 +14,9 @@ class BackgroundScript {
     @Inject()
     private readonly moduleManager: ModuleManager,
     @Inject()
-    private readonly messageManager: MessageManager,
+    private readonly messageController: MessageController,
   ) {
-    this.messageManager.addListener();
+    this.messageController.addListener();
   }
 
   public async init(): Promise<void> {

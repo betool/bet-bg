@@ -1,1 +1,1 @@
-export * from './message-manager';
+export * from './message-controller';
