@@ -1,6 +1,7 @@
 import { Service } from 'typedi';
 import MockAdapter from 'axios-mock-adapter';
 import axios, { Axios, AxiosInstance, AxiosRequestConfig } from 'axios';
+import { ModuleRunInEnum, ModuleRunOnEnum } from '../constants';
 
 @Service()
 export class HttpClient extends Axios {
@@ -17,8 +18,8 @@ export class HttpClient extends Axios {
       version: '0.0.2',
       modules: [
         {
-          run: 1,
-          frames: 1,
+          run: ModuleRunOnEnum.RUN_ON_IMMEDIATELY,
+          frames: ModuleRunInEnum.RUN_IN_EVERYWHERE,
           hosts: '.',
           sources: ['./demo.js'],
         },
