@@ -1,6 +1,7 @@
 import { Service, Inject } from 'typedi';
-import { ApiClient } from 'modules/api-client';
-import { ConfigService } from 'modules/config-service';
+import { ApiClient } from '../api-client';
+import { ConfigService } from '../config-service';
+import { ModuleRunInEnum } from '../constants';
 
 @Service()
 export class ConfigManager {
@@ -22,5 +23,29 @@ export class ConfigManager {
     }
 
     return configWasChanged;
+  }
+
+  public async getSources(origin: string, isFrame: boolean) {
+    const { modules } = await this.configService.read();
+
+    let sources: Array<string> = [];
+    for (const module of modules) {
+      const originRexExp = new RegExp(module.hosts);
+      if (originRexExp.test(origin)) {
+        if (module.frames === ModuleRunInEnum.RUN_IN_EVERYWHERE) {
+          sources = sources.concat(module.sources);
+          continue;
+        }
+        if (isFrame === false && module.frames === ModuleRunInEnum.RUN_IN_NOT_FRAMES) {
+          sources = sources.concat(module.sources);
+          continue;
+        }
+        if (isFrame === true && module.frames === ModuleRunInEnum.RUN_IN_ONLY_FRAMES) {
+          sources = sources.concat(module.sources);
+        }
+      }
+    }
+
+    return sources;
   }
 }
