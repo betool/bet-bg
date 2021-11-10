@@ -1,6 +1,5 @@
-import { stringLiteral } from '@babel/types';
 import localForage from 'localforage';
-import { Service, Inject } from 'typedi';
+import { Service } from 'typedi';
 
 @Service({ global: true })
 export class StorageManager {
@@ -12,7 +11,7 @@ export class StorageManager {
     });
   }
 
-  public getItem<GetItemType>(key: string): Promise<GetItemType> {
+  public getItem<GetItemType>(key: string): Promise<GetItemType | null> {
     return this.storage.getItem<GetItemType>(key);
   }
 

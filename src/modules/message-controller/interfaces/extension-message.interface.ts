@@ -1,4 +1,4 @@
-import { MessageReasonEnum } from 'modules/constants';
+import { MessageReasonEnum } from '../constants';
 
 export interface ControllerMessage {
   readonly reason: MessageReasonEnum;

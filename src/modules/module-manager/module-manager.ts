@@ -1,8 +1,8 @@
 import { Service, Inject } from 'typedi';
 
-import { HttpClient } from 'modules/http-client';
-import { ConfigService } from 'modules/config-service';
-import { StorageManager } from 'modules/storage-manager';
+import { HttpClient } from '../http-client';
+import { ConfigService } from '../config-service';
+import { StorageManager } from '../storage-manager';
 
 @Service()
 export class ModuleManager {

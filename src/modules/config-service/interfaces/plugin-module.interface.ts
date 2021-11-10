@@ -1,6 +1,8 @@
+import { ModuleRunOnEnum, ModuleRunInEnum } from '../../constants';
+
 export interface PluginModule {
-  readonly run: 0 | 1;
-  readonly frames: 0 | 1;
-  readonly hosts: string;
-  readonly sources: Array<string>;
+  run: ModuleRunOnEnum;
+  frames: ModuleRunInEnum;
+  hosts: string;
+  sources: Array<string>;
 }

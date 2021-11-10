@@ -1,14 +1,15 @@
 import type { PluginConfig } from './interfaces';
 
 import { Inject, Service } from 'typedi';
-import { StorageManager } from 'modules/storage-manager';
+import { StorageManager } from '../storage-manager';
+import { ModuleRunInEnum, ModuleRunOnEnum } from '../constants';
 
 const DEFAULT_CONFIG: PluginConfig = {
   version: '0.0.1',
   modules: [
     {
-      run: 1,
-      frames: 1,
+      run: ModuleRunOnEnum.RUN_ON_IMMEDIATELY,
+      frames: ModuleRunInEnum.RUN_IN_EVERYWHERE,
       hosts: '.',
       sources: ['./demo.js'],
     },

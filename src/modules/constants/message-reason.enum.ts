@@ -1,3 +1,4 @@
 export enum MessageReasonEnum {
-  PING,
+  PING = 0,
+  GET_SOURCES = 1,
 }
