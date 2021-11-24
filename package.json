@@ -46,6 +46,7 @@
   "dependencies": {
     "axios": "^0.23.0",
     "axios-mock-adapter": "^1.20.0",
+    "extensionizer": "^1.0.1",
     "localforage": "^1.10.0",
     "reflect-metadata": "^0.1.13",
     "typedi": "^0.10.0"

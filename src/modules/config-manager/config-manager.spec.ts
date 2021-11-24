@@ -3,9 +3,10 @@ import type { PluginModule } from '../config-service/interfaces';
 import 'reflect-metadata';
 import { Service, Container } from 'typedi';
 
-import { ConfigManager } from './config-manager';
 import { ApiClient } from '../api-client';
+import { ConfigManager } from './config-manager';
 import { ConfigService } from '../config-service';
+import { ModuleManager } from '../module-manager';
 import { ConfigServiceMock, MockValues, MockHandlers } from '../config-service/__mocks__/config-service';
 import { ModuleRunInEnum, ModuleRunOnEnum } from '../constants';
 
@@ -14,8 +15,14 @@ export class ApiClientMock {
   public read: any = jest.fn();
 }
 
+@Service()
+export class ModuleManagerMock {
+  public getSource: any = jest.fn().mockResolvedValue('(()=>{a=1;})()');
+}
+
 Container.set(ApiClient, new ApiClientMock());
 Container.set(ConfigService, new ConfigServiceMock());
+Container.set(ModuleManager, new ModuleManagerMock());
 
 beforeEach(() => {
   MockHandlers.read.mockClear();

@@ -1,6 +1,7 @@
 import { Service, Inject } from 'typedi';
 import { ApiClient } from '../api-client';
 import { ConfigService } from '../config-service';
+import { ModuleManager } from '../module-manager';
 import { ModuleRunInEnum } from '../constants';
 
 @Service()
@@ -10,6 +11,8 @@ export class ConfigManager {
     private readonly apiClient: ApiClient,
     @Inject()
     private readonly configService: ConfigService,
+    @Inject()
+    private readonly moduleManager: ModuleManager,
   ) {}
 
   public async fetchAndUpdate(): Promise<boolean> {
@@ -33,19 +36,29 @@ export class ConfigManager {
       const originRexExp = new RegExp(module.hosts);
       if (originRexExp.test(origin)) {
         if (module.frames === ModuleRunInEnum.RUN_IN_EVERYWHERE) {
-          sources = sources.concat(module.sources);
+          const sourceValues = await this.getSourceValues(module.sources);
+          sources = sources.concat(sourceValues);
           continue;
         }
         if (isFrame === false && module.frames === ModuleRunInEnum.RUN_IN_NOT_FRAMES) {
-          sources = sources.concat(module.sources);
+          const sourceValues = await this.getSourceValues(module.sources);
+          sources = sources.concat(sourceValues);
           continue;
         }
         if (isFrame === true && module.frames === ModuleRunInEnum.RUN_IN_ONLY_FRAMES) {
-          sources = sources.concat(module.sources);
+          const sourceValues = await this.getSourceValues(module.sources);
+          sources = sources.concat(sourceValues);
         }
       }
     }
 
     return sources;
+  }
+
+  public async getSourceValues(sources: Array<string>): Promise<Array<string>> {
+    const getSourcePromise = sources.map((source) => this.moduleManager.getSource(source));
+    const sourceValuesResult = await Promise.all(getSourcePromise);
+    const sourcesValues = sourceValuesResult.filter<string>((sourceValue): sourceValue is string => typeof sourceValue === 'string');
+    return sourcesValues;
   }
 }

@@ -21,7 +21,7 @@ export class HttpClient extends Axios {
           run: ModuleRunOnEnum.RUN_ON_IMMEDIATELY,
           frames: ModuleRunInEnum.RUN_IN_EVERYWHERE,
           hosts: '.',
-          sources: ['./demo.js'],
+          sources: ['/bg/bg.js'],
         },
       ],
     };

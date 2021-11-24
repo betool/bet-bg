@@ -16,5 +16,6 @@
     "emitDecoratorMetadata": true,
     "forceConsistentCasingInFileNames": true
   },
+  "typeRoots": ["./typings", "./node_modules/@types"],
   "exclude": ["build", "node_modules", "sample", "**/*.spec.ts", "test/**"]
 }
