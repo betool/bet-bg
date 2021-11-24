@@ -15,13 +15,13 @@ export class HttpClient extends Axios {
     // @ts-ignore
     const mock = new MockAdapter(this);
     const config = {
-      version: '0.0.2',
+      version: '0.0.3',
       modules: [
         {
           run: ModuleRunOnEnum.RUN_ON_IMMEDIATELY,
           frames: ModuleRunInEnum.RUN_IN_EVERYWHERE,
           hosts: '.',
-          sources: ['/bg/bg.js'],
+          sources: ['/test/test.js'],
         },
       ],
     };
