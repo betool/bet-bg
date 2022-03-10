@@ -1,14 +1,14 @@
-import type { PluginModule } from '../config-service/interfaces';
+import type { PluginModule } from '../../common/config-service/interfaces';
 
 import 'reflect-metadata';
 import { Service, Container } from 'typedi';
 
-import { ApiClient } from '../api-client';
+import { ApiClient } from '../../common/api-client';
 import { ConfigManager } from './config-manager';
-import { ConfigService } from '../config-service';
+import { ConfigService } from '../../common/config-service';
 import { ModuleManager } from '../module-manager';
-import { ConfigServiceMock, MockValues, MockHandlers } from '../config-service/__mocks__/config-service';
-import { ModuleRunInEnum, ModuleRunOnEnum } from '../constants';
+import { ConfigServiceMock, MockValues, MockHandlers } from '../../common/config-service/__mocks__/config-service';
+import { ModuleRunInEnum, ModuleRunOnEnum } from '../../constants';
 
 @Service()
 export class ApiClientMock {

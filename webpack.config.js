@@ -13,12 +13,12 @@ const config = {
   entry: {
     bg: path.join(__dirname, './src/modules/betool/bg/bg.ts'),
     cs: path.join(__dirname, './src/modules/betool/cs/cs.ts'),
-    test: path.join(__dirname, './src/modules/test/test.ts'),
+    app: path.join(__dirname, './src/modules/app/app.ts'),
   },
   output: {
     path: path.join(__dirname, 'dist'),
     filename: (pathData) => {
-      if (['bg', 'cs', 'test'].includes(pathData.runtime)) {
+      if (['bg', 'cs', 'app'].includes(pathData.runtime)) {
         return `${pathData.runtime}/[name].js`;
       }
       return '[name].js';
