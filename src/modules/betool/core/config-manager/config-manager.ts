@@ -1,8 +1,8 @@
 import { Service, Inject } from 'typedi';
-import { ApiClient } from '../api-client';
-import { ConfigService } from '../config-service';
-import { ModuleManager } from '../module-manager';
-import { ModuleRunInEnum } from '../constants';
+import { ApiClient } from '../../common/api-client';
+import { ConfigService } from '../../common/config-service';
+import { ModuleManager } from '../../core/module-manager';
+import { ModuleRunInEnum } from '../../constants';
 
 @Service()
 export class ConfigManager {

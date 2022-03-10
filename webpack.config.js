@@ -11,8 +11,8 @@ const config = {
   target: 'web',
   cache: false,
   entry: {
-    bg: path.join(__dirname, './src/modules/bg/bg.ts'),
-    cs: path.join(__dirname, './src/modules/cs/cs.ts'),
+    bg: path.join(__dirname, './src/modules/betool/bg/bg.ts'),
+    cs: path.join(__dirname, './src/modules/betool/cs/cs.ts'),
     test: path.join(__dirname, './src/modules/test/test.ts'),
   },
   output: {

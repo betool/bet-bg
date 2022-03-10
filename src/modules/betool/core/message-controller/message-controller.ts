@@ -1,8 +1,8 @@
 import { Service, Inject } from 'typedi';
 
 import { ControllerMessage } from './interfaces';
-import { MessageReasonEnum } from '../constants';
 import { MessageService } from '../message-service';
+import { MessageReasonEnum } from '../../constants';
 
 @Service()
 export class MessageController {

@@ -1,9 +1,9 @@
 import { Service, Inject } from 'typedi';
 import extensionizer from 'extensionizer';
 
-import { HttpClient } from '../http-client';
-import { ConfigService } from '../config-service';
-import { StorageManager } from '../storage-manager';
+import { HttpClient } from '../../core/http-module';
+import { StorageManager } from '../../core/storage-manager';
+import { ConfigService } from '../../common/config-service';
 
 @Service()
 export class ModuleManager {

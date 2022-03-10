@@ -2,7 +2,7 @@ import 'reflect-metadata';
 
 import { Container, Service } from 'typedi';
 import { MessageReasonEnum } from '../constants';
-import { ControllerMessage } from '../message-controller/interfaces';
+import { ControllerMessage } from '../../message-controller/interfaces';
 
 const message: ControllerMessage = {
   reason: MessageReasonEnum.GET_SOURCES,

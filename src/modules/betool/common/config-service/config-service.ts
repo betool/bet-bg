@@ -1,8 +1,8 @@
 import type { PluginConfig } from './interfaces';
 
 import { Inject, Service } from 'typedi';
-import { StorageManager } from '../storage-manager';
-import { ModuleRunInEnum, ModuleRunOnEnum } from '../constants';
+import { StorageManager } from '../../core/storage-manager';
+import { ModuleRunInEnum, ModuleRunOnEnum } from '../../constants';
 
 const DEFAULT_CONFIG: PluginConfig = {
   version: '0.0.1',

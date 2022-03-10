@@ -2,9 +2,9 @@ import 'reflect-metadata';
 
 import { Container, Inject, Service } from 'typedi';
 
-import { MessageController } from '../message-controller';
-import { ModuleManager } from '../module-manager';
-import { ConfigManager } from '../config-manager';
+import { MessageController } from '../core/message-controller';
+import { ModuleManager } from '../core/module-manager';
+import { ConfigManager } from '../core/config-manager';
 
 @Service()
 class BackgroundScript {
