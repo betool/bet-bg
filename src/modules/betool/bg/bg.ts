@@ -4,13 +4,13 @@ import { Container, Inject, Service } from 'typedi';
 
 import { BackgroundMessangerModule } from '../core/background-messanger';
 import { ConfigManagerModule } from '../core/config-manager';
-import { ModuleManager } from '../core/module-manager';
+import { SourceManagerModule } from '../core/source-manager';
 
 @Service()
 class BackgroundScript {
   constructor(
     @Inject()
-    private readonly moduleManager: ModuleManager,
+    private readonly sourceManager: SourceManagerModule,
     @Inject()
     private readonly configManager: ConfigManagerModule,
     @Inject()
@@ -23,7 +23,7 @@ class BackgroundScript {
     const configWasChanged = await this.configManager.fetchAndUpdate();
 
     if (configWasChanged) {
-      await this.moduleManager.init();
+      await this.sourceManager.init();
     }
   }
 }

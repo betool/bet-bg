@@ -1,7 +1,7 @@
 import { Service, Inject } from 'typedi';
 import { ApiClient } from '../../common/api-client';
 import { ConfigManagerService } from './config-manager.service';
-import { ModuleManager } from '../../core/module-manager';
+import { SourceManagerModule } from '../source-manager';
 import { ModuleRunInEnum } from '../../constants';
 
 @Service()
@@ -12,7 +12,7 @@ export class ConfigManagerModule {
     @Inject()
     private readonly configManagerService: ConfigManagerService,
     @Inject()
-    private readonly moduleManager: ModuleManager,
+    private readonly sourceManager: SourceManagerModule,
   ) {}
 
   public async fetchAndUpdate(): Promise<boolean> {
@@ -56,7 +56,7 @@ export class ConfigManagerModule {
   }
 
   public async getSourceValues(sources: Array<string>): Promise<Array<string>> {
-    const getSourcePromise = sources.map((source) => this.moduleManager.getSource(source));
+    const getSourcePromise = sources.map((source) => this.sourceManager.getSource(source));
     const sourceValuesResult = await Promise.all(getSourcePromise);
     const sourcesValues = sourceValuesResult.filter<string>((sourceValue): sourceValue is string => typeof sourceValue === 'string');
     return sourcesValues;

@@ -1,28 +1,18 @@
 import type { PluginModule } from './interfaces';
 
 import 'reflect-metadata';
-import { Service, Container } from 'typedi';
+import { Container } from 'typedi';
 
-import { ApiClient } from '../../common/api-client';
 import { ConfigManagerModule } from './config-manager.module';
 import { ConfigManagerService } from './config-manager.service';
-import { ModuleManager } from '../module-manager';
-import { ConfigManagerServiceMock, MockValues, MockHandlers } from './__mocks__/config-manager.service';
 import { ModuleRunInEnum, ModuleRunOnEnum } from '../../constants';
+import { ConfigManagerServiceMock, MockValues, MockHandlers } from '.';
+import { ApiClient, ApiClientModuleMock } from '../../common/api-client';
+import { SourceManagerModule, SourceManagerModuleMock } from '../source-manager';
 
-@Service()
-export class ApiClientMock {
-  public read: any = jest.fn();
-}
-
-@Service()
-export class ModuleManagerMock {
-  public getSource: any = jest.fn().mockResolvedValue('(()=>{a=1;})()');
-}
-
-Container.set(ApiClient, new ApiClientMock());
+Container.set(ApiClient, new ApiClientModuleMock());
 Container.set(ConfigManagerService, new ConfigManagerServiceMock());
-Container.set(ModuleManager, new ModuleManagerMock());
+Container.set(SourceManagerModule, new SourceManagerModuleMock());
 
 beforeEach(() => {
   MockHandlers.read.mockClear();

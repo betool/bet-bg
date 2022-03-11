@@ -6,7 +6,7 @@ import { ConfigManagerRepository } from '../config-manager';
 import { ConfigManagerService } from '../../core/config-manager';
 
 @Service()
-export class ModuleManager {
+export class SourceManagerModule {
   constructor(
     @Inject()
     private readonly httpClient: HttpClientModule,

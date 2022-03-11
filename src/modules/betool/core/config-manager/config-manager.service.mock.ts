@@ -1,6 +1,6 @@
 import { Service } from 'typedi';
-import { PluginConfig } from '../interfaces';
-import { ModuleRunInEnum, ModuleRunOnEnum } from '../../../constants';
+import { PluginConfig } from './interfaces';
+import { ModuleRunInEnum, ModuleRunOnEnum } from '../../constants';
 
 const defaultConfig: PluginConfig = {
   version: '0.0.1',
