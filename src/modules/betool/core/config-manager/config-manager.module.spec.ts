@@ -4,8 +4,8 @@ import 'reflect-metadata';
 import { Container } from 'typedi';
 
 import { ConfigManagerModule } from './config-manager.module';
+import { ModuleRunInEnum, ModuleRunOnEnum } from '../constants';
 import { ConfigManagerService } from './config-manager.service';
-import { ModuleRunInEnum, ModuleRunOnEnum } from '../../constants';
 import { ConfigManagerServiceMock, MockValues, MockHandlers } from '.';
 import { ApiClientModule, ApiClientModuleMock } from '../api-client';
 import { SourceManagerModule, SourceManagerModuleMock } from '../source-manager';

@@ -1,8 +1,8 @@
 import type { PluginConfig } from './interfaces';
 
 import { Inject, Service } from 'typedi';
+import { ModuleRunInEnum, ModuleRunOnEnum } from '../constants';
 import { ConfigManagerRepository } from './config-manager.repository';
-import { ModuleRunInEnum, ModuleRunOnEnum } from '../../constants';
 
 const DEFAULT_CONFIG: PluginConfig = {
   version: '0.0.1',

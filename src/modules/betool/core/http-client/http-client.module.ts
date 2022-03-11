@@ -1,7 +1,7 @@
 import { Service } from 'typedi';
 import MockAdapter from 'axios-mock-adapter';
 import axios, { Axios, AxiosInstance, AxiosRequestConfig } from 'axios';
-import { ModuleRunInEnum, ModuleRunOnEnum } from '../../constants';
+import { ModuleRunInEnum, ModuleRunOnEnum } from '../constants';
 
 @Service()
 export class HttpClientModule extends Axios {

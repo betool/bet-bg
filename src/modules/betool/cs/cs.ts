@@ -1,10 +1,10 @@
+import type { BackgroundMessage } from '../core/background-messanger';
+
 import 'reflect-metadata';
-
 import { Container, Service } from 'typedi';
-import { MessageReasonEnum } from '../constants';
-import { ControllerMessage } from '../../message-controller/interfaces';
+import { MessageReasonEnum } from '../core/constants';
 
-const message: ControllerMessage = {
+const message: BackgroundMessage = {
   reason: MessageReasonEnum.GET_SOURCES,
 };
 

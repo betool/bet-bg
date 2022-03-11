@@ -1,7 +1,7 @@
 import { Service, Inject } from 'typedi';
 
+import { MessageReasonEnum } from '../constants';
 import { BackgroundMessage } from './interfaces';
-import { MessageReasonEnum } from '../../constants';
 import { BackgroundMessangerService } from './background-messanger.service';
 
 @Service()
