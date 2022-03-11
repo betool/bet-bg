@@ -1,13 +1,13 @@
 import type { PluginConfig } from '../../core/config-manager/interfaces';
 
 import { Inject, Service } from 'typedi';
-import { HttpClient } from '../../core/http-module';
+import { HttpClientModule } from '../../core/http-client';
 
 @Service()
 export class ApiClient {
   constructor(
     @Inject()
-    private readonly httpClient: HttpClient,
+    private readonly httpClient: HttpClientModule,
   ) {}
 
   public async configRead(): Promise<PluginConfig> {

@@ -1,7 +1,7 @@
 import { Service, Inject } from 'typedi';
 import extensionizer from 'extensionizer';
 
-import { HttpClient } from '../../core/http-module';
+import { HttpClientModule } from '../../core/http-client';
 import { StorageManager } from '../../core/storage-manager';
 import { ConfigManagerService } from '../../core/config-manager';
 
@@ -9,7 +9,7 @@ import { ConfigManagerService } from '../../core/config-manager';
 export class ModuleManager {
   constructor(
     @Inject()
-    private readonly httpClient: HttpClient,
+    private readonly httpClient: HttpClientModule,
     @Inject()
     private readonly configManagerService: ConfigManagerService,
     @Inject()

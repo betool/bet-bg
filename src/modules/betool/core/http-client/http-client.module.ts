@@ -4,7 +4,7 @@ import axios, { Axios, AxiosInstance, AxiosRequestConfig } from 'axios';
 import { ModuleRunInEnum, ModuleRunOnEnum } from '../../constants';
 
 @Service()
-export class HttpClient extends Axios {
+export class HttpClientModule extends Axios {
   constructor() {
     const timeout = 1000;
     const baseURL = 'http://localhost.home/api';
