@@ -7,10 +7,10 @@ import { ConfigManagerModule } from './config-manager.module';
 import { ConfigManagerService } from './config-manager.service';
 import { ModuleRunInEnum, ModuleRunOnEnum } from '../../constants';
 import { ConfigManagerServiceMock, MockValues, MockHandlers } from '.';
-import { ApiClient, ApiClientModuleMock } from '../../common/api-client';
+import { ApiClientModule, ApiClientModuleMock } from '../api-client';
 import { SourceManagerModule, SourceManagerModuleMock } from '../source-manager';
 
-Container.set(ApiClient, new ApiClientModuleMock());
+Container.set(ApiClientModule, new ApiClientModuleMock());
 Container.set(ConfigManagerService, new ConfigManagerServiceMock());
 Container.set(SourceManagerModule, new SourceManagerModuleMock());
 

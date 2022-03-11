@@ -1,2 +1,2 @@
 export * from './api-client.module.mock';
-export * from './api-client';
+export * from './api-client.module';

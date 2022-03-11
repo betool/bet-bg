@@ -4,7 +4,7 @@ import { Inject, Service } from 'typedi';
 import { HttpClientModule } from '../../core/http-client';
 
 @Service()
-export class ApiClient {
+export class ApiClientModule {
   constructor(
     @Inject()
     private readonly httpClient: HttpClientModule,

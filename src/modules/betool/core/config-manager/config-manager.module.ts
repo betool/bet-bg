@@ -1,14 +1,14 @@
 import { Service, Inject } from 'typedi';
-import { ApiClient } from '../../common/api-client';
-import { ConfigManagerService } from './config-manager.service';
+import { ApiClientModule } from '../api-client';
 import { SourceManagerModule } from '../source-manager';
+import { ConfigManagerService } from './config-manager.service';
 import { ModuleRunInEnum } from '../../constants';
 
 @Service()
 export class ConfigManagerModule {
   constructor(
     @Inject()
-    private readonly apiClient: ApiClient,
+    private readonly apiClient: ApiClientModule,
     @Inject()
     private readonly configManagerService: ConfigManagerService,
     @Inject()
