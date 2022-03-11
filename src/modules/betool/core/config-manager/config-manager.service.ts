@@ -1,7 +1,7 @@
 import type { PluginConfig } from './interfaces';
 
 import { Inject, Service } from 'typedi';
-import { StorageManager } from '../../core/storage-manager';
+import { ConfigManagerRepository } from './config-manager.repository';
 import { ModuleRunInEnum, ModuleRunOnEnum } from '../../constants';
 
 const DEFAULT_CONFIG: PluginConfig = {
@@ -23,14 +23,14 @@ export class ConfigManagerService {
 
   constructor(
     @Inject()
-    private readonly storageManager: StorageManager,
+    private readonly configManagerRepository: ConfigManagerRepository,
   ) {}
 
   public async read(): Promise<PluginConfig> {
     let config: PluginConfig = this.defaultConfig;
 
     try {
-      const configFromStorage = await this.storageManager.getItem<PluginConfig>(this.configKey);
+      const configFromStorage = await this.configManagerRepository.getItem<PluginConfig>(this.configKey);
       if (configFromStorage !== null) {
         config = configFromStorage;
       }
@@ -44,7 +44,7 @@ export class ConfigManagerService {
   }
 
   public async write(config: PluginConfig): Promise<void> {
-    await this.storageManager.setItem(this.configKey, config);
+    await this.configManagerRepository.setItem(this.configKey, config);
     console.log('write', config);
   }
 }

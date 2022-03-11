@@ -1,9 +1,10 @@
-import localForage from 'localforage';
 import { Service } from 'typedi';
+import localForage from 'localforage';
 
 @Service({ global: true })
-export class StorageManager {
+export class ConfigManagerRepository {
   private readonly storage: LocalForage;
+
   constructor() {
     this.storage = localForage.createInstance({
       name: 'plugin-storage',

@@ -2,7 +2,7 @@ import { Service, Inject } from 'typedi';
 import extensionizer from 'extensionizer';
 
 import { HttpClientModule } from '../../core/http-client';
-import { StorageManager } from '../../core/storage-manager';
+import { ConfigManagerRepository } from '../config-manager';
 import { ConfigManagerService } from '../../core/config-manager';
 
 @Service()
@@ -13,7 +13,7 @@ export class ModuleManager {
     @Inject()
     private readonly configManagerService: ConfigManagerService,
     @Inject()
-    private readonly storageManager: StorageManager,
+    private readonly configManagerRepository: ConfigManagerRepository,
   ) {}
 
   public async init(): Promise<void> {
@@ -46,11 +46,11 @@ export class ModuleManager {
     const client = this.httpClient.createHttpClient();
     const { data } = await client.get(sourceUrl);
 
-    await this.storageManager.setItem(sourceUrl, data);
+    await this.configManagerRepository.setItem(sourceUrl, data);
   }
 
   public getSource(source: string): Promise<string | null> {
     const sourceUrl: string = /^((https?)|(ftps?))/.test(source) ? source : extensionizer.runtime.getURL(source);
-    return this.storageManager.getItem<string>(sourceUrl);
+    return this.configManagerRepository.getItem<string>(sourceUrl);
   }
 }
