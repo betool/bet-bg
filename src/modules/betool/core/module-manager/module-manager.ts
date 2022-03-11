@@ -3,7 +3,7 @@ import extensionizer from 'extensionizer';
 
 import { HttpClient } from '../../core/http-module';
 import { StorageManager } from '../../core/storage-manager';
-import { ConfigService } from '../../common/config-service';
+import { ConfigManagerService } from '../../core/config-manager';
 
 @Service()
 export class ModuleManager {
@@ -11,13 +11,13 @@ export class ModuleManager {
     @Inject()
     private readonly httpClient: HttpClient,
     @Inject()
-    private readonly configService: ConfigService,
+    private readonly configManagerService: ConfigManagerService,
     @Inject()
     private readonly storageManager: StorageManager,
   ) {}
 
   public async init(): Promise<void> {
-    const config = await this.configService.read();
+    const config = await this.configManagerService.read();
 
     if (Array.isArray(config.modules)) {
       for (const pluginModule of config.modules) {

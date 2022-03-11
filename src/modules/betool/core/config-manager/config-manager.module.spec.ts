@@ -1,13 +1,13 @@
-import type { PluginModule } from '../../common/config-service/interfaces';
+import type { PluginModule } from './interfaces';
 
 import 'reflect-metadata';
 import { Service, Container } from 'typedi';
 
 import { ApiClient } from '../../common/api-client';
-import { ConfigManager } from './config-manager';
-import { ConfigService } from '../../common/config-service';
+import { ConfigManagerModule } from './config-manager.module';
+import { ConfigManagerService } from './config-manager.service';
 import { ModuleManager } from '../module-manager';
-import { ConfigServiceMock, MockValues, MockHandlers } from '../../common/config-service/__mocks__/config-service';
+import { ConfigManagerServiceMock, MockValues, MockHandlers } from './__mocks__/config-manager.service';
 import { ModuleRunInEnum, ModuleRunOnEnum } from '../../constants';
 
 @Service()
@@ -21,15 +21,15 @@ export class ModuleManagerMock {
 }
 
 Container.set(ApiClient, new ApiClientMock());
-Container.set(ConfigService, new ConfigServiceMock());
+Container.set(ConfigManagerService, new ConfigManagerServiceMock());
 Container.set(ModuleManager, new ModuleManagerMock());
 
 beforeEach(() => {
   MockHandlers.read.mockClear();
 });
 
-describe('ConfigManager', () => {
-  const configManager = Container.get(ConfigManager);
+describe('ConfigManagerModule', () => {
+  const configManagerModule = Container.get(ConfigManagerModule);
 
   describe('isFrame is true', () => {
     test.each`
@@ -61,7 +61,7 @@ describe('ConfigManager', () => {
 
         // When
         MockValues.config.modules = [pluginModule];
-        const actual = await configManager.getSources(origin, isFrame);
+        const actual = await configManagerModule.getSources(origin, isFrame);
 
         // Then
         expect(actual).toHaveLength(expectedLength);
@@ -98,7 +98,7 @@ describe('ConfigManager', () => {
 
           // When
           MockValues.config.modules = [pluginModule];
-          const actual = await configManager.getSources(origin, isFrame);
+          const actual = await configManagerModule.getSources(origin, isFrame);
 
           // Then
           expect(actual).toHaveLength(expectedLength);

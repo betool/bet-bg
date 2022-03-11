@@ -1,1 +1,2 @@
-export * from './config-manager';
+export * from './config-manager.service';
+export * from './config-manager.module';

@@ -1,11 +1,11 @@
 import { Service, Inject } from 'typedi';
-import { ConfigManager } from '../config-manager';
+import { ConfigManagerModule } from '../config-manager';
 
 @Service()
 export class BackgroundMessangerService {
   constructor(
     @Inject()
-    private readonly configManager: ConfigManager,
+    private readonly configManager: ConfigManagerModule,
   ) {}
   public ping(): Promise<string> {
     return Promise.resolve('pong');

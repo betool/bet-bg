@@ -1,4 +1,4 @@
-import type { PluginConfig } from '../config-service/interfaces';
+import type { PluginConfig } from '../../core/config-manager/interfaces';
 
 import { Inject, Service } from 'typedi';
 import { HttpClient } from '../../core/http-module';

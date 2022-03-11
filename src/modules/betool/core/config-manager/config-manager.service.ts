@@ -17,7 +17,7 @@ const DEFAULT_CONFIG: PluginConfig = {
 };
 
 @Service()
-export class ConfigService {
+export class ConfigManagerService {
   private readonly configKey: string = 'CONFIG_KEY';
   private readonly defaultConfig: PluginConfig = DEFAULT_CONFIG;
 

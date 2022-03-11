@@ -3,16 +3,16 @@ import 'reflect-metadata';
 import { Container, Inject, Service } from 'typedi';
 
 import { BackgroundMessangerModule } from '../core/background-messanger';
+import { ConfigManagerModule } from '../core/config-manager';
 import { ModuleManager } from '../core/module-manager';
-import { ConfigManager } from '../core/config-manager';
 
 @Service()
 class BackgroundScript {
   constructor(
     @Inject()
-    private readonly configManager: ConfigManager,
-    @Inject()
     private readonly moduleManager: ModuleManager,
+    @Inject()
+    private readonly configManager: ConfigManagerModule,
     @Inject()
     private readonly backgroundMessanger: BackgroundMessangerModule,
   ) {

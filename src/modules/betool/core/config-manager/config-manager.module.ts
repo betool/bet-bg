@@ -1,35 +1,35 @@
 import { Service, Inject } from 'typedi';
 import { ApiClient } from '../../common/api-client';
-import { ConfigService } from '../../common/config-service';
+import { ConfigManagerService } from './config-manager.service';
 import { ModuleManager } from '../../core/module-manager';
 import { ModuleRunInEnum } from '../../constants';
 
 @Service()
-export class ConfigManager {
+export class ConfigManagerModule {
   constructor(
     @Inject()
     private readonly apiClient: ApiClient,
     @Inject()
-    private readonly configService: ConfigService,
+    private readonly configManagerService: ConfigManagerService,
     @Inject()
     private readonly moduleManager: ModuleManager,
   ) {}
 
   public async fetchAndUpdate(): Promise<boolean> {
     const remoteConfig = await this.apiClient.configRead();
-    const localConfig = await this.configService.read();
+    const localConfig = await this.configManagerService.read();
 
     const configWasChanged = localConfig.version !== remoteConfig.version;
 
     if (configWasChanged) {
-      await this.configService.write(remoteConfig);
+      await this.configManagerService.write(remoteConfig);
     }
 
     return configWasChanged;
   }
 
   public async getSources(origin: string, isFrame: boolean) {
-    const { modules } = await this.configService.read();
+    const { modules } = await this.configManagerService.read();
 
     let sources: Array<string> = [];
     for (const module of modules) {

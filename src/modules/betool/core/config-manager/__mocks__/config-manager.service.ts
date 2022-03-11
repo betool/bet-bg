@@ -22,6 +22,6 @@ export const MockHandlers = {
 };
 
 @Service()
-export class ConfigServiceMock {
+export class ConfigManagerServiceMock {
   public read = MockHandlers.read;
 }
