@@ -6,8 +6,9 @@ import { Container } from 'typedi';
 import { ConfigManagerModule } from './config-manager.module';
 import { ModuleRunInEnum, ModuleRunOnEnum } from '../constants';
 import { ConfigManagerService } from './config-manager.service';
-import { ConfigManagerServiceMock, MockValues, MockHandlers } from '.';
-import { ApiClientModule, ApiClientModuleMock } from '../api-client';
+import { ApiClientModule } from '../api-client/api-client.module';
+import { ConfigManagerServiceMock, MockValues, MockHandlers } from './config-manager.service.mock';
+import { ApiClientModuleMock } from '../api-client/api-client.module.mock';
 import { SourceManagerModule, SourceManagerModuleMock } from '../source-manager';
 
 Container.set(ApiClientModule, new ApiClientModuleMock());
