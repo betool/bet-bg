@@ -2,7 +2,7 @@ import 'reflect-metadata';
 
 import { Container, Inject, Service } from 'typedi';
 
-import { BackgroundMessangerModule } from '../core/background-messanger';
+import { BackgroundMessengerModule } from '../core/messengers';
 import { ConfigManagerModule } from '../core/config-manager';
 import { SourceManagerModule } from '../core/source-manager';
 
@@ -14,9 +14,10 @@ class BackgroundScript {
     @Inject()
     private readonly configManager: ConfigManagerModule,
     @Inject()
-    private readonly backgroundMessanger: BackgroundMessangerModule,
+    private readonly backgroundMessenger: BackgroundMessengerModule,
   ) {
-    this.backgroundMessanger.addListener();
+    console.log('bg-');
+    this.backgroundMessenger.addListener();
   }
 
   public async init(): Promise<void> {
@@ -30,5 +31,3 @@ class BackgroundScript {
 
 const backgroundScript = Container.get(BackgroundScript);
 backgroundScript.init();
-
-console.log('bg');

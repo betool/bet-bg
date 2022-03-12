@@ -1,21 +1,21 @@
 import { Service, Inject } from 'typedi';
 
-import { MessageReasonEnum } from '../constants';
-import { BackgroundMessage } from './interfaces';
-import { BackgroundMessangerService } from './background-messanger.service';
+import { BetMessage } from '../interfaces';
+import { MessageReasonEnum } from '../../constants';
+import { BackgroundMessengerService } from './background-messenger.service';
 
 @Service()
-export class BackgroundMessangerModule {
+export class BackgroundMessengerModule {
   constructor(
     @Inject()
-    public readonly backgroundMessangerService: BackgroundMessangerService,
+    public readonly backgroundMessengerService: BackgroundMessengerService,
   ) {}
   public addListener() {
     chrome.runtime.onMessage.addListener(this.listenerHandler.bind(this));
   }
 
   private listenerHandler(
-    message: BackgroundMessage,
+    message: BetMessage,
     sender: chrome.runtime.MessageSender,
     sendResponse: (response: unknown) => void,
   ): boolean {
@@ -28,7 +28,7 @@ export class BackgroundMessangerModule {
 
     switch (message?.reason) {
       case MessageReasonEnum.PING:
-        this.backgroundMessangerService
+        this.backgroundMessengerService
           .ping()
           .then((response) => sendResponse(response))
           .catch((error) => {
@@ -37,7 +37,7 @@ export class BackgroundMessangerModule {
           });
         break;
       case MessageReasonEnum.GET_SOURCES:
-        this.backgroundMessangerService
+        this.backgroundMessengerService
           .getSources(sender)
           .then((response) => sendResponse(response))
           .catch((error) => {

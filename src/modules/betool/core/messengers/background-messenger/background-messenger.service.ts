@@ -1,8 +1,8 @@
 import { Service, Inject } from 'typedi';
-import { ConfigManagerModule } from '../config-manager';
+import { ConfigManagerModule } from '../../config-manager';
 
 @Service()
-export class BackgroundMessangerService {
+export class BackgroundMessengerService {
   constructor(
     @Inject()
     private readonly configManager: ConfigManagerModule,

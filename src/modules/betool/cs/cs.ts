@@ -1,26 +1,24 @@
-import type { BackgroundMessage } from '../core/background-messanger';
-
 import 'reflect-metadata';
-import { Container, Service } from 'typedi';
-import { MessageReasonEnum } from '../core/constants';
-
-const message: BackgroundMessage = {
-  reason: MessageReasonEnum.GET_SOURCES,
-};
+import { Container, Inject, Service } from 'typedi';
+import { ContentMessengerModule } from '../core/messengers';
 
 @Service()
 class ContentScript {
+  constructor(
+    @Inject()
+    private readonly contentMessenger: ContentMessengerModule,
+  ) {
+    console.log('cs-');
+  }
+
   public async init(): Promise<void> {
-    chrome.runtime.sendMessage(null, message, null, (data) => {
-      const scriptTag = document.createElement('script');
-      scriptTag.type = 'text/javascript';
-      scriptTag.text = data[0];
-      document.body.appendChild(scriptTag);
-    });
+    const sources = await this.contentMessenger.getSources();
+    const scriptTag = document.createElement('script');
+    scriptTag.type = 'text/javascript';
+    scriptTag.text = (sources as Array<string>)[0] as string;
+    document.body.appendChild(scriptTag);
   }
 }
 
 const contentScript = Container.get(ContentScript);
 contentScript.init();
-
-console.log('cs');

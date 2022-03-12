@@ -1,6 +1,6 @@
-import { MessageReasonEnum } from '../../../constants';
+import { MessageReasonEnum } from '../../constants';
 
-export interface BackgroundMessage {
+export interface BetMessage {
   readonly reason: MessageReasonEnum;
   // TODO: Add generic
   readonly payload?: unknown;
