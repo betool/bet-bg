@@ -3,6 +3,7 @@ import { ModuleRunInEnum } from '../constants';
 import { ApiClientModule } from '../api-client';
 import { SourceManagerModule } from '../source-manager';
 import { ConfigManagerService } from './config-manager.service';
+import { PluginModule } from './interfaces';
 
 @Service()
 export class ConfigManagerModule {
@@ -31,28 +32,36 @@ export class ConfigManagerModule {
   public async getSources(origin: string, isFrame: boolean) {
     const { modules } = await this.configManagerService.read();
 
-    let sources: Array<string> = [];
+    let sources: [Array<string>, Array<string>, Array<string>, Array<string>] = [[], [], [], []];
     for (const module of modules) {
       const originRexExp = new RegExp(module.hosts);
       if (originRexExp.test(origin)) {
         if (module.frames === ModuleRunInEnum.RUN_IN_EVERYWHERE) {
           const sourceValues = await this.getSourceValues(module.sources);
-          sources = sources.concat(sourceValues);
+          this.putSources(sources, module, sourceValues);
           continue;
         }
         if (isFrame === false && module.frames === ModuleRunInEnum.RUN_IN_NOT_FRAMES) {
           const sourceValues = await this.getSourceValues(module.sources);
-          sources = sources.concat(sourceValues);
+          this.putSources(sources, module, sourceValues);
           continue;
         }
         if (isFrame === true && module.frames === ModuleRunInEnum.RUN_IN_ONLY_FRAMES) {
           const sourceValues = await this.getSourceValues(module.sources);
-          sources = sources.concat(sourceValues);
+          this.putSources(sources, module, sourceValues);
         }
       }
     }
 
     return sources;
+  }
+
+  public putSources(
+    target: [Array<string>, Array<string>, Array<string>, Array<string>],
+    module: PluginModule,
+    sourceValues: Array<string>,
+  ) {
+    target[module.run] = target[module.run].concat(sourceValues);
   }
 
   public async getSourceValues(sources: Array<string>): Promise<Array<string>> {
