@@ -1,7 +1,7 @@
 import type { PluginConfig } from './interfaces';
 
 import { Inject, Service } from 'typedi';
-import { ModuleRunInEnum, ModuleRunOnEnum } from '../constants';
+import { ModuleMountEnum, ModuleRunInEnum, ModuleRunOnEnum } from '../constants';
 import { ConfigManagerRepository } from './config-manager.repository';
 
 const DEFAULT_CONFIG: PluginConfig = {
@@ -10,6 +10,7 @@ const DEFAULT_CONFIG: PluginConfig = {
     {
       run: ModuleRunOnEnum.RUN_ON_IMMEDIATELY,
       frames: ModuleRunInEnum.RUN_IN_EVERYWHERE,
+      mount: ModuleMountEnum.MOUNT_SCRIPT_EVALUATE,
       hosts: '.',
       sources: ['./demo.js'],
     },

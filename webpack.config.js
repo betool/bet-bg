@@ -14,12 +14,22 @@ const config = {
     bg: path.join(__dirname, './src/modules/betool/bg/bg.ts'),
     cs: path.join(__dirname, './src/modules/betool/cs/cs.ts'),
     app: path.join(__dirname, './src/modules/app/app.ts'),
+    'delay-5-1': path.join(__dirname, './src/modules/app/delay-5-1.ts'),
+    'delay-5-2': path.join(__dirname, './src/modules/app/delay-5-2.ts'),
+    'delay-10': path.join(__dirname, './src/modules/app/delay-10.ts'),
+    immediately: path.join(__dirname, './src/modules/app/immediately.ts'),
+    random: path.join(__dirname, './src/modules/app/random.ts'),
+    ready: path.join(__dirname, './src/modules/app/ready.ts'),
   },
   output: {
     path: path.join(__dirname, 'dist'),
     filename: (pathData) => {
+      console.log(pathData);
       if (['bg', 'cs', 'app'].includes(pathData.runtime)) {
         return `${pathData.runtime}/[name].js`;
+      }
+      if (['delay-5-1', 'delay-5-2', 'delay-10', 'immediately', 'random', 'ready'].includes(pathData.runtime)) {
+        return `app/[name].js`;
       }
       return '[name].js';
     },

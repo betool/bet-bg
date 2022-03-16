@@ -1,3 +1,8 @@
-import { MessageReasonEnum } from '../../constants';
+import { SourceConfiguration } from './source-configuration.interface';
 
-export type SourcesMessage = [Array<string>, Array<string>, Array<string>, Array<string>];
+export type SourcesMessage = [
+  Array<SourceConfiguration>,
+  Array<SourceConfiguration>,
+  Array<SourceConfiguration>,
+  Array<SourceConfiguration>,
+];

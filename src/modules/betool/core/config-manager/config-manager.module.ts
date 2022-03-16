@@ -4,6 +4,7 @@ import { ApiClientModule } from '../api-client';
 import { SourceManagerModule } from '../source-manager';
 import { ConfigManagerService } from './config-manager.service';
 import { PluginModule } from './interfaces';
+import { SourceConfiguration, SourcesMessage } from '../messengers';
 
 @Service()
 export class ConfigManagerModule {
@@ -29,10 +30,10 @@ export class ConfigManagerModule {
     return configWasChanged;
   }
 
-  public async getSources(origin: string, isFrame: boolean) {
+  public async getSources(origin: string, isFrame: boolean): Promise<SourcesMessage> {
     const { modules } = await this.configManagerService.read();
 
-    let sources: [Array<string>, Array<string>, Array<string>, Array<string>] = [[], [], [], []];
+    let sources: SourcesMessage = [[], [], [], []];
     for (const module of modules) {
       const originRexExp = new RegExp(module.hosts);
       if (originRexExp.test(origin)) {
@@ -56,12 +57,13 @@ export class ConfigManagerModule {
     return sources;
   }
 
-  public putSources(
-    target: [Array<string>, Array<string>, Array<string>, Array<string>],
-    module: PluginModule,
-    sourceValues: Array<string>,
-  ) {
-    target[module.run] = target[module.run].concat(sourceValues);
+  public putSources(target: SourcesMessage, module: PluginModule, sourceValues: Array<string>) {
+    const sourceConfiguration: SourceConfiguration = {
+      mount: module.mount,
+      sources: sourceValues,
+      delay: module.delay,
+    };
+    target[module.run].push(sourceConfiguration);
   }
 
   public async getSourceValues(sources: Array<string>): Promise<Array<string>> {

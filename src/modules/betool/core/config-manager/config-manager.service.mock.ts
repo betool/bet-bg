@@ -1,6 +1,6 @@
 import { Service } from 'typedi';
 import { PluginConfig } from './interfaces';
-import { ModuleRunInEnum, ModuleRunOnEnum } from '../constants';
+import { ModuleMountEnum, ModuleRunInEnum, ModuleRunOnEnum } from '../constants';
 
 const defaultConfig: PluginConfig = {
   version: '0.0.1',
@@ -8,6 +8,7 @@ const defaultConfig: PluginConfig = {
     {
       run: ModuleRunOnEnum.RUN_ON_IMMEDIATELY,
       frames: ModuleRunInEnum.RUN_IN_EVERYWHERE,
+      mount: ModuleMountEnum.MOUNT_SCRIPT_EVALUATE,
       hosts: '.',
       sources: ['./a.js'],
     },
